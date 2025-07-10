@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: "pjinsight"
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/products-api"
+    username: "postgres"
+    password: "@Senha123"
+  jpa:
+    hibernate:
+      ddl-auto: "update"
+      show-sql: "true"
