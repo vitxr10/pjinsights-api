@@ -2,12 +2,12 @@ package br.com.santander.pjinsight.model;
 
 import br.com.santander.pjinsight.model.enums.RegistrationStatus;
 import br.com.santander.pjinsight.model.enums.Size;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -33,6 +33,9 @@ public class Company {
     private Size size;
 
     private RegistrationStatus registrationStatus;
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Set<Address> addressList;
 
 
 }

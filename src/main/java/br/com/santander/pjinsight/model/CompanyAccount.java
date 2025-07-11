@@ -22,7 +22,7 @@ public class CompanyAccount {
     private BigDecimal balance;
     private String agency;
     private String number;
-    private String type;
+    private AccountType type;
     private String institution;
     private LocalDateTime openingDate;
     private String companyId;

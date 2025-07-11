@@ -5,8 +5,6 @@ import br.com.santander.pjinsight.model.enums.PaymentMethod;
 import br.com.santander.pjinsight.model.enums.Status;
 import br.com.santander.pjinsight.model.enums.Type;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,6 +18,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 public class Transaction {
+
+    // rever algumas restricoes
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
