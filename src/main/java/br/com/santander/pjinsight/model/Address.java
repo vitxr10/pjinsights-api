@@ -24,10 +24,5 @@ public class Address {
     private String country;
     private String additionalAddressData;
     private String number;
-
-
-    private Long companyId;
-
-
-
+    private String companyId;
 }

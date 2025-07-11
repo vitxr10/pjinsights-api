@@ -22,6 +22,8 @@ public class Company {
 
     private String cnpj;
 
+    private String pjOpeningDate;
+
     private String cnae;
 
     private String email;

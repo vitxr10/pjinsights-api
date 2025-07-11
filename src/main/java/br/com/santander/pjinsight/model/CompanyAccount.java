@@ -19,14 +19,12 @@ public class CompanyAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
     private BigDecimal balance;
     private String agency;
     private String number;
-    private AccountType type;
+    private String type;
     private String institution;
     private LocalDateTime openingDate;
-
-    private Long companyId;
+    private String companyId;
 
 }
