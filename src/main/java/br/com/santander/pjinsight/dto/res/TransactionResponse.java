@@ -1,26 +1,21 @@
-package br.com.santander.pjinsight.dto;
+package br.com.santander.pjinsight.dto.res;
 
-import br.com.santander.pjinsight.model.enums.Category;
-import br.com.santander.pjinsight.model.enums.PaymentMethod;
-import br.com.santander.pjinsight.model.enums.Status;
-import br.com.santander.pjinsight.model.enums.Type;
+import br.com.santander.pjinsight.model.enums.CategoryEnum;
+import br.com.santander.pjinsight.model.enums.PaymentMethodEnum;
+import br.com.santander.pjinsight.model.enums.StatusEnum;
+import br.com.santander.pjinsight.model.enums.TypeEnum;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class TransactionDTO {
+public class TransactionResponse {
 
     @NotNull(message = "Data e hora são obrigatórios")
     @PastOrPresent(message = "Data e hora não pode ser no futuro")
@@ -31,7 +26,7 @@ public class TransactionDTO {
     private BigDecimal amount;
 
     @NotNull(message = "Categoria é obrigatória")
-    private Category category;
+    private CategoryEnum category;
 
     @NotBlank(message = "ID do remetente é obrigatório")
     @Pattern(
@@ -56,13 +51,13 @@ public class TransactionDTO {
     private BigDecimal newBalance;
 
     @NotNull(message = "Método de pagamento é obrigatório")
-    private PaymentMethod paymentMethod;
+    private PaymentMethodEnum paymentMethod;
 
     @NotNull(message = "Status da transação é obrigatório")
-    private Status status;
+    private StatusEnum status;
 
     @NotNull(message = "Tipo de transação é obrigatório")
-    private Type type;
+    private TypeEnum type;
 
     @Size(max = 255, message = "Descrição deve ter até 255 caracteres")
     private String description;

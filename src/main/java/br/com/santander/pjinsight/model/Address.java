@@ -21,9 +21,5 @@ public class Address {
     private String country;
     private String additionalAddressData;
     private String number;
-
-
-    @ManyToOne
-    @JoinColumn(name = "company_id")
     private String companyId;
 }

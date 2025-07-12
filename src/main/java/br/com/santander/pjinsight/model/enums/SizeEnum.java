@@ -1,6 +1,6 @@
 package br.com.santander.pjinsight.model.enums;
 
-public enum Size {
+public enum SizeEnum {
     BIG,
     SMALL,
     MEDIUM

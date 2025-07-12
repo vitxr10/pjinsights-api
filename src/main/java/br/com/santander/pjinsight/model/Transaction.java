@@ -1,9 +1,9 @@
 package br.com.santander.pjinsight.model;
 
-import br.com.santander.pjinsight.model.enums.Category;
-import br.com.santander.pjinsight.model.enums.PaymentMethod;
-import br.com.santander.pjinsight.model.enums.Status;
-import br.com.santander.pjinsight.model.enums.Type;
+import br.com.santander.pjinsight.model.enums.CategoryEnum;
+import br.com.santander.pjinsight.model.enums.PaymentMethodEnum;
+import br.com.santander.pjinsight.model.enums.StatusEnum;
+import br.com.santander.pjinsight.model.enums.TypeEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,14 +26,14 @@ public class Transaction {
     private String id;
     private LocalDateTime dateTime;
     private BigDecimal amount;
-    private Category category;
+    private CategoryEnum category;
     private String senderId;
     private String receiverId;
     private BigDecimal previousBalance;
     private BigDecimal newBalance;
-    private PaymentMethod paymentMethod;
-    private Status status;
-    private Type type;
+    private PaymentMethodEnum paymentMethod;
+    private StatusEnum status;
+    private TypeEnum type;
     private String description;
 
 

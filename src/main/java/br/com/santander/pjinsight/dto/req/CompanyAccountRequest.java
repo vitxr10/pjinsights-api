@@ -1,6 +1,6 @@
-package br.com.santander.pjinsight.dto;
+package br.com.santander.pjinsight.dto.req;
 
-import br.com.santander.pjinsight.model.enums.AccountType;
+import br.com.santander.pjinsight.model.enums.AccountTypeEnum;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +17,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CompanyAccountDTO {
+public class CompanyAccountRequest {
+
+    private String id;
 
     @NotNull(message = "Saldo é obrigatório")
     @DecimalMin(value = "0.00", inclusive = true, message = "Saldo deve ser maior ou igual a zero")
@@ -32,7 +34,7 @@ public class CompanyAccountDTO {
     private String number;
 
     @NotNull(message = "Tipo de conta é obrigatório")
-    private AccountType type;
+    private AccountTypeEnum type;
 
     @NotBlank(message = "Instituição é obrigatória")
     @Size(max = 100, message = "Instituição deve ter até 100 caracteres")

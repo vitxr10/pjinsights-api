@@ -1,4 +1,4 @@
-package br.com.santander.pjinsight.dto;
+package br.com.santander.pjinsight.dto.res;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AddressDTO {
+public class AddressResponse {
 
     @NotBlank(message = "Rua é obrigatória")
     @Size(max = 100, message = "Rua deve ter até 100 caracteres")

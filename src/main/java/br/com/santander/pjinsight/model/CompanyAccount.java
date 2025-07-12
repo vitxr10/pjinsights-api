@@ -1,6 +1,6 @@
 package br.com.santander.pjinsight.model;
 
-import br.com.santander.pjinsight.model.enums.AccountType;
+import br.com.santander.pjinsight.model.enums.AccountTypeEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,7 +22,7 @@ public class CompanyAccount {
     private BigDecimal balance;
     private String agency;
     private String number;
-    private AccountType type;
+    private AccountTypeEnum type;
     private String institution;
     private LocalDateTime openingDate;
     private String companyId;

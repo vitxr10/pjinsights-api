@@ -1,6 +1,7 @@
-package br.com.santander.pjinsight.dto;
+package br.com.santander.pjinsight.dto.req;
 
-import br.com.santander.pjinsight.model.enums.RegistrationStatus;
+import br.com.santander.pjinsight.model.enums.RegistrationStatusEnum;
+import br.com.santander.pjinsight.model.enums.SizeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,9 @@ import jakarta.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CompanyDTO {
+public class CompanyRequest {
+
+    private String id;
 
     @NotBlank(message = "Nome é obrigatório")
     @Size(max = 100, message = "Nome deve ter até 100 caracteres")
@@ -50,8 +53,8 @@ public class CompanyDTO {
     private String telephone;
 
     @NotNull(message = "Tamanho da empresa é obrigatório")
-    private br.com.santander.pjinsight.model.enums.Size size;
+    private SizeEnum size;
 
     @NotNull(message = "Status de registro é obrigatório")
-    private RegistrationStatus registrationStatus;
+    private RegistrationStatusEnum registrationStatus;
 }

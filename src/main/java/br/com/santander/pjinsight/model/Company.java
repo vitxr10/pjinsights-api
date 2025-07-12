@@ -1,13 +1,10 @@
 package br.com.santander.pjinsight.model;
 
-import br.com.santander.pjinsight.model.enums.RegistrationStatus;
-import br.com.santander.pjinsight.model.enums.Size;
+import br.com.santander.pjinsight.model.enums.RegistrationStatusEnum;
+import br.com.santander.pjinsight.model.enums.SizeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-
-import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -30,12 +27,12 @@ public class Company {
 
     private String telephone;
 
-    private Size size;
+    private SizeEnum size;
 
-    private RegistrationStatus registrationStatus;
+    private RegistrationStatusEnum registrationStatus;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    private Set<Address> addressList;
+//    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+//    private Set<Address> addressList;
 
 
 }

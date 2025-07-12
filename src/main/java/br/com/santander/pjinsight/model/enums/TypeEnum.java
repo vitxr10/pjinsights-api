@@ -1,4 +1,4 @@
 package br.com.santander.pjinsight.model.enums;
 
-public enum Category {
+public enum TypeEnum {
 }
