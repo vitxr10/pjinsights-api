@@ -5,6 +5,7 @@ import br.com.santander.pjinsight.dto.req.AddressRequest;
 import br.com.santander.pjinsight.dto.res.AddressResponse;
 import br.com.santander.pjinsight.model.Address;
 import br.com.santander.pjinsight.repository.AddressRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
