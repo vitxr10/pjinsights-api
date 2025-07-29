@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.santander.pjinsight.model.CompanyAccount;
 
-public interface CompanyAccountRepository extends JpaRepository<CompanyAccount, String> {
+import java.util.UUID;
+
+public interface CompanyAccountRepository extends JpaRepository<CompanyAccount, UUID> {
     
 }

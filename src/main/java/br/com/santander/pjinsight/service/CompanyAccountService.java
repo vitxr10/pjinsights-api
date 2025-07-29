@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 import static br.com.santander.pjinsight.mapper.ObjectMapper.*;
 
@@ -23,14 +24,14 @@ public class CompanyAccountService {
         return parseObject(account, CompanyAccountResponse.class);
     }
 
-    public CompanyAccountResponse findById(String id) {
+    public CompanyAccountResponse findById(UUID id) {
         CompanyAccount account = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         return parseObject(account, CompanyAccountResponse.class);
     }
 
-    public List<CompanyAccountRequest> findAll() {
-        return parseListObjects(repository.findAll(), CompanyAccountRequest.class);
+    public List<CompanyAccountResponse> findAll() {
+        return parseListObjects(repository.findAll(), CompanyAccountResponse.class);
     }
 
     public CompanyAccountResponse update(CompanyAccountRequest req) {
@@ -39,7 +40,7 @@ public class CompanyAccountService {
         return parseObject(account, CompanyAccountResponse.class);
     }
 
-    public CompanyAccountResponse deleteById(String id) {
+    public CompanyAccountResponse deleteById(UUID id) {
         CompanyAccount account = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);

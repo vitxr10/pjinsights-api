@@ -7,12 +7,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class AddressResponse {
+
+    private UUID id;
 
     @NotBlank(message = "Rua é obrigatória")
     @Size(max = 100, message = "Rua deve ter até 100 caracteres")
@@ -43,5 +46,5 @@ public class AddressResponse {
 
     @NotBlank(message = "ID da empresa é obrigatório")
     @Pattern(regexp = "^[0-9a-fA-F\\-]{36}$", message = "ID da empresa deve ser um UUID válido")
-    private String companyId;
+    private UUID companyId;
 }

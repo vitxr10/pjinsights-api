@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 
 import static br.com.santander.pjinsight.mapper.ObjectMapper.*;
@@ -25,14 +26,14 @@ public class AddressService {
         return parseObject(address, AddressResponse.class);
     }
 
-    public AddressResponse findById(String id) {
+    public AddressResponse findById(UUID id) {
         Address result = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         return parseObject(result, AddressResponse.class);
 
     }
 
-    public List<AddressRequest> findAll() {
-        return parseListObjects(repository.findAll(), AddressRequest.class);
+    public List<AddressResponse> findAll() {
+        return parseListObjects(repository.findAll(), AddressResponse.class);
     }
 
     public AddressResponse update(AddressRequest addressRequest){
@@ -41,7 +42,7 @@ public class AddressService {
       return parseObject(address,AddressResponse.class);
     }
 
-    public AddressResponse deleteById(String id){
+    public AddressResponse deleteById(UUID id){
         Address address = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);
         return parseObject(address,AddressResponse.class);

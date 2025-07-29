@@ -7,24 +7,27 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class CompanyAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
     private BigDecimal balance;
     private String agency;
     private String number;
     private AccountTypeEnum type;
     private String institution;
     private LocalDateTime openingDate;
-    private String companyId;
+    private UUID companyId;
 
 }

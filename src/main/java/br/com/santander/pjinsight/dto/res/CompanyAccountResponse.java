@@ -8,11 +8,14 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class CompanyAccountResponse {
+
+    private UUID id;
 
     @NotNull(message = "Saldo é obrigatório")
     @DecimalMin(value = "0.00", inclusive = true, message = "Saldo deve ser maior ou igual a zero")
@@ -42,5 +45,5 @@ public class CompanyAccountResponse {
             regexp = "^[0-9a-fA-F\\-]{36}$",
             message = "ID da empresa deve ser um UUID válido"
     )
-    private String companyId;
+    private UUID companyId;
 }

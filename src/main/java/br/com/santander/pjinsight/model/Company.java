@@ -5,15 +5,19 @@ import br.com.santander.pjinsight.model.enums.SizeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     private String name;
 
@@ -27,8 +31,10 @@ public class Company {
 
     private String telephone;
 
+    @Enumerated(EnumType.STRING)
     private SizeEnum size;
 
+    @Enumerated(EnumType.STRING)
     private RegistrationStatusEnum registrationStatus;
 
 //    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)

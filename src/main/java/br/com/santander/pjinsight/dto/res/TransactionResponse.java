@@ -11,11 +11,14 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class TransactionResponse {
+
+    private UUID id;
 
     @NotNull(message = "Data e hora são obrigatórios")
     @PastOrPresent(message = "Data e hora não pode ser no futuro")
@@ -33,14 +36,14 @@ public class TransactionResponse {
             regexp = "^[0-9a-fA-F\\-]{36}$",
             message = "ID do remetente deve ser um UUID válido"
     )
-    private String senderId;
+    private UUID senderId;
 
     @NotBlank(message = "ID do destinatário é obrigatório")
     @Pattern(
             regexp = "^[0-9a-fA-F\\-]{36}$",
             message = "ID do destinatário deve ser um UUID válido"
     )
-    private String receiverId;
+    private UUID receiverId;
 
     @NotNull(message = "Saldo anterior é obrigatório")
     @DecimalMin(value = "0.00", inclusive = true, message = "Saldo anterior não pode ser negativo")

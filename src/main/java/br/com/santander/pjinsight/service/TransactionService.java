@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 import static br.com.santander.pjinsight.mapper.ObjectMapper.*;
 
@@ -23,14 +24,14 @@ public class TransactionService {
         return parseObject(tx, TransactionResponse.class);
     }
 
-    public TransactionResponse findById(String id) {
+    public TransactionResponse findById(UUID id) {
         Transaction tx = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         return parseObject(tx, TransactionResponse.class);
     }
 
-    public List<TransactionRequest> findAll() {
-        return parseListObjects(repository.findAll(), TransactionRequest.class);
+    public List<TransactionResponse> findAll() {
+        return parseListObjects(repository.findAll(), TransactionResponse.class);
     }
 
     public TransactionResponse update(TransactionRequest req) {
@@ -39,7 +40,7 @@ public class TransactionService {
         return parseObject(tx, TransactionResponse.class);
     }
 
-    public TransactionResponse deleteById(String id) {
+    public TransactionResponse deleteById(UUID id) {
         Transaction tx = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);

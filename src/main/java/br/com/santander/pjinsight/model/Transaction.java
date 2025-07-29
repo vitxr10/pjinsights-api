@@ -4,18 +4,18 @@ import br.com.santander.pjinsight.model.enums.CategoryEnum;
 import br.com.santander.pjinsight.model.enums.PaymentMethodEnum;
 import br.com.santander.pjinsight.model.enums.StatusEnum;
 import br.com.santander.pjinsight.model.enums.TypeEnum;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Transaction {
 
@@ -23,16 +23,20 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
     private LocalDateTime dateTime;
     private BigDecimal amount;
+    @Enumerated(EnumType.STRING)
     private CategoryEnum category;
-    private String senderId;
-    private String receiverId;
+    private UUID senderId;
+    private UUID receiverId;
     private BigDecimal previousBalance;
     private BigDecimal newBalance;
+    @Enumerated(EnumType.STRING)
     private PaymentMethodEnum paymentMethod;
+    @Enumerated(EnumType.STRING)
     private StatusEnum status;
+    @Enumerated(EnumType.STRING)
     private TypeEnum type;
     private String description;
 
