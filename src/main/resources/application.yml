@@ -12,3 +12,7 @@ spring:
       hibernate:
     show-sql: false
     open-in-view: false
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET}

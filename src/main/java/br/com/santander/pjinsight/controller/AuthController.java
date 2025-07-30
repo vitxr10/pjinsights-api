@@ -1,11 +1,13 @@
 package br.com.santander.pjinsight.controller;
 
-import br.com.santander.pjinsight.dto.req.AuthenticationDTO;
+import br.com.santander.pjinsight.dto.req.LoginRequestDTO;
 import br.com.santander.pjinsight.dto.req.RegisterDTO;
+import br.com.santander.pjinsight.dto.res.LoginResponseDTO;
 import br.com.santander.pjinsight.model.User;
 import br.com.santander.pjinsight.repository.UserRepository;
+import br.com.santander.pjinsight.service.TokenService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,27 +20,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@AllArgsConstructor
 public class AuthController {
 
-    @Autowired
+
     private AuthenticationManager authenticationManager;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private UserRepository userRepository;
+    private TokenService tokenService;
+
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.getLogin(), data.getPassword());
         var auth = authenticationManager.authenticate(usernamePassword);
-        return ResponseEntity.ok().build();
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+        return ResponseEntity.ok(new LoginResponseDTO(token));
 
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data) {
         if (this.userRepository.findByLogin(data.getLogin()) != null) return ResponseEntity.badRequest().build();
         String encryptedPassword = passwordEncoder.encode(data.getPassword());
         User newUser = new User(data.getLogin(), encryptedPassword, data.getRole());

@@ -5,6 +5,7 @@ import br.com.santander.pjinsight.dto.res.AddressResponse;
 import br.com.santander.pjinsight.service.AddressService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +15,11 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
+@NoArgsConstructor
 @RequestMapping("/address")
 public class AddressController {
 
-    private final AddressService addressService;
+    private AddressService addressService;
 
     @GetMapping
     public ResponseEntity<List<AddressResponse>> findAll() {

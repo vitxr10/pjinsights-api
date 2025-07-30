@@ -42,10 +42,10 @@ public class AddressService {
       return parseObject(address,AddressResponse.class);
     }
 
-    public AddressResponse deleteById(UUID id){
+    public void deleteById(UUID id){
         Address address = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);
-        return parseObject(address,AddressResponse.class);
+        parseObject(address, AddressResponse.class);
     }
 
     private void setAddress(Address address,AddressRequest addressRequest){

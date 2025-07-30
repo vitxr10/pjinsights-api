@@ -3,6 +3,7 @@ package br.com.santander.pjinsight.model;
 import br.com.santander.pjinsight.model.enums.UserRoleEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,9 +15,10 @@ import java.util.List;
 
 @Entity(name = "users")
 @Table(name = "users")
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class User implements UserDetails {
 
     @Id
@@ -67,4 +69,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }
