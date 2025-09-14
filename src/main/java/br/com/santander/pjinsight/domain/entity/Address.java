@@ -1,0 +1,29 @@
+package br.com.santander.pjinsight.domain.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class Address {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    private String street;
+    private String state;
+    private String zipCode;
+    private String city;
+    private String country;
+    private String additionalAddressData;
+    private String number;
+    private UUID companyId;
+}
