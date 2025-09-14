@@ -1,13 +1,16 @@
 package br.com.santander.pjinsight.controller;
 
 import br.com.santander.pjinsight.dto.req.LoginRequestDTO;
-import br.com.santander.pjinsight.dto.req.RegisterDTO;
+import br.com.santander.pjinsight.dto.req.RegisterRequest;
 import br.com.santander.pjinsight.dto.res.LoginResponseDTO;
+import br.com.santander.pjinsight.dto.res.RegisterResponse;
 import br.com.santander.pjinsight.model.User;
 import br.com.santander.pjinsight.repository.UserRepository;
+import br.com.santander.pjinsight.service.AuthorizationService;
 import br.com.santander.pjinsight.service.TokenService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,10 +28,9 @@ public class AuthController {
 
 
     private AuthenticationManager authenticationManager;
-    private PasswordEncoder passwordEncoder;
     private UserRepository userRepository;
     private TokenService tokenService;
-
+    AuthorizationService authorizationService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO data) {
@@ -40,12 +42,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data) {
+    public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterRequest data) {
         if (this.userRepository.findByLogin(data.getLogin()) != null) return ResponseEntity.badRequest().build();
-        String encryptedPassword = passwordEncoder.encode(data.getPassword());
-        User newUser = new User(data.getLogin(), encryptedPassword, data.getRole());
-        this.userRepository.save(newUser);
-        return ResponseEntity.ok().build();
+        RegisterResponse registerResponse = authorizationService.insert(data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
 
     }
 

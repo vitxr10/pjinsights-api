@@ -6,6 +6,7 @@ import br.com.santander.pjinsight.service.AddressService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequestMapping("/address")
 public class AddressController {
 
+    @Autowired
     private AddressService addressService;
 
     @GetMapping

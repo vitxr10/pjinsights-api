@@ -32,7 +32,7 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<CompanyResponse> insert(@RequestBody @Valid CompanyRequest request) {
+    public ResponseEntity<CompanyResponse> insert(@RequestBody  CompanyRequest request) {
         var company = companyService.save(request);
         return new ResponseEntity<>(company,HttpStatus.CREATED);
     }

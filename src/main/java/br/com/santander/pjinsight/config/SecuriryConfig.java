@@ -33,7 +33,7 @@ public class SecuriryConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll() // mudar
                         .requestMatchers(HttpMethod.GET, "/company").authenticated()
-                        .anyRequest().hasRole("ADMIN")
+                        .anyRequest().permitAll()//.hasRole("ADMIN")
 
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

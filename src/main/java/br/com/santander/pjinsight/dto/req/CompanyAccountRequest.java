@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class CompanyAccountRequest {
-
+    @NotBlank
     private UUID id;
 
     @NotNull(message = "Saldo é obrigatório")

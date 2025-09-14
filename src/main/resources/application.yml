@@ -15,4 +15,4 @@ spring:
 api:
   security:
     token:
-      secret: ${JWT_SECRET}
+      secret: pjinsights1234567
