@@ -4,47 +4,51 @@ import br.com.santander.pjinsight.application.model.request.TransactionRequest;
 import br.com.santander.pjinsight.application.model.response.TransactionResponse;
 import br.com.santander.pjinsight.domain.entity.Transaction;
 import br.com.santander.pjinsight.infrastructure.repository.TransactionRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-
-import static br.com.santander.pjinsight.mapper.ObjectMapper.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class TransactionService {
 
     private final TransactionRepository repository;
+    private final ObjectMapper objectMapper;
 
     public TransactionResponse save(TransactionRequest req) {
-        Transaction tx = repository.save(parseObject(req, Transaction.class));
-        return parseObject(tx, TransactionResponse.class);
+        Transaction tx = objectMapper.convertValue(req, Transaction.class);
+        repository.save(tx);
+        return objectMapper.convertValue(tx, TransactionResponse.class);
     }
 
     public TransactionResponse findById(UUID id) {
         Transaction tx = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        return parseObject(tx, TransactionResponse.class);
+        return objectMapper.convertValue(tx, TransactionResponse.class);
     }
 
     public List<TransactionResponse> findAll() {
-        return parseListObjects(repository.findAll(), TransactionResponse.class);
+        return repository.findAll().stream()
+                .map(tx -> objectMapper.convertValue(tx, TransactionResponse.class))
+                .collect(Collectors.toList());
     }
 
     public TransactionResponse update(TransactionRequest req) {
         Transaction tx = repository.getReferenceById(req.getId());
         setTransaction(tx, req);
-        return parseObject(tx, TransactionResponse.class);
+        return objectMapper.convertValue(tx, TransactionResponse.class);
     }
 
     public TransactionResponse deleteById(UUID id) {
         Transaction tx = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);
-        return parseObject(tx, TransactionResponse.class);
+        return objectMapper.convertValue(tx, TransactionResponse.class);
     }
 
     private void setTransaction(Transaction tx, TransactionRequest req) {

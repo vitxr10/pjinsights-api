@@ -4,47 +4,51 @@ import br.com.santander.pjinsight.application.model.request.CompanyRequest;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
 import br.com.santander.pjinsight.domain.entity.Company;
 import br.com.santander.pjinsight.infrastructure.repository.CompanyRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-
-import static br.com.santander.pjinsight.mapper.ObjectMapper.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class CompanyService {
 
     private final CompanyRepository repository;
+    private final ObjectMapper objectMapper; // Jackson sendo injetado
 
     public CompanyResponse save(CompanyRequest companyRequest) {
-        Company company = repository.save(parseObject(companyRequest, Company.class));
-        return parseObject(company, CompanyResponse.class);
+        Company company = objectMapper.convertValue(companyRequest, Company.class);
+        repository.save(company);
+        return objectMapper.convertValue(company, CompanyResponse.class);
     }
 
     public CompanyResponse findById(UUID id) {
         Company company = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        return parseObject(company, CompanyResponse.class);
+        return objectMapper.convertValue(company, CompanyResponse.class);
     }
 
     public List<CompanyResponse> findAll() {
-        return parseListObjects(repository.findAll(), CompanyResponse.class);
+        return repository.findAll().stream()
+                .map(company -> objectMapper.convertValue(company, CompanyResponse.class))
+                .collect(Collectors.toList());
     }
 
     public CompanyResponse update(CompanyRequest companyRequest) {
         Company company = repository.getReferenceById(companyRequest.getId());
         setCompany(company, companyRequest);
-        return parseObject(company, CompanyResponse.class);
+        return objectMapper.convertValue(company, CompanyResponse.class);
     }
 
     public CompanyResponse deleteById(UUID id) {
         Company company = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);
-        return parseObject(company, CompanyResponse.class);
+        return objectMapper.convertValue(company, CompanyResponse.class);
     }
 
     private void setCompany(Company company, CompanyRequest req) {

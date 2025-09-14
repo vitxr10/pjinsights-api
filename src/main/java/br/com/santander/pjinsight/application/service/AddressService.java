@@ -1,54 +1,56 @@
 package br.com.santander.pjinsight.application.service;
 
-
 import br.com.santander.pjinsight.application.model.request.AddressRequest;
 import br.com.santander.pjinsight.application.model.response.AddressResponse;
 import br.com.santander.pjinsight.domain.entity.Address;
 import br.com.santander.pjinsight.infrastructure.repository.AddressRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-
-
-import static br.com.santander.pjinsight.mapper.ObjectMapper.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class AddressService {
 
-    private AddressRepository repository;
+    private final AddressRepository repository;
+    private final ObjectMapper objectMapper; // injetado pelo Spring
 
     public AddressResponse save(AddressRequest addressRequest){
-        Address address = repository.save(parseObject(addressRequest, Address.class));
-        return parseObject(address, AddressResponse.class);
+        Address address = objectMapper.convertValue(addressRequest, Address.class);
+        repository.save(address);
+        return objectMapper.convertValue(address, AddressResponse.class);
     }
 
     public AddressResponse findById(UUID id) {
         Address result = repository.findById(id).orElseThrow(EntityNotFoundException::new);
-        return parseObject(result, AddressResponse.class);
-
+        return objectMapper.convertValue(result, AddressResponse.class);
     }
 
     public List<AddressResponse> findAll() {
-        return parseListObjects(repository.findAll(), AddressResponse.class);
+        return repository.findAll()
+                .stream()
+                .map(address -> objectMapper.convertValue(address, AddressResponse.class))
+                .collect(Collectors.toList());
     }
 
     public AddressResponse update(AddressRequest addressRequest){
-      Address address = repository.getReferenceById(addressRequest.getId());
-      setAddress(address,addressRequest);
-      return parseObject(address,AddressResponse.class);
+        Address address = repository.getReferenceById(addressRequest.getId());
+        setAddress(address, addressRequest);
+        return objectMapper.convertValue(address, AddressResponse.class);
     }
 
     public void deleteById(UUID id){
         Address address = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);
-        parseObject(address, AddressResponse.class);
+        objectMapper.convertValue(address, AddressResponse.class);
     }
 
-    private void setAddress(Address address,AddressRequest addressRequest){
+    private void setAddress(Address address, AddressRequest addressRequest){
         address.setCountry(addressRequest.getCountry());
         address.setCity(addressRequest.getCity());
         address.setNumber(addressRequest.getNumber());
