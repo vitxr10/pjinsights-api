@@ -1,112 +1,112 @@
---company
-
-CREATE TABLE IF NOT EXISTS public.company
-(
-    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    cnae character varying(255) COLLATE pg_catalog."default",
-    cnpj character varying(255) COLLATE pg_catalog."default",
-    email character varying(255) COLLATE pg_catalog."default",
-    name character varying(255) COLLATE pg_catalog."default",
-    pj_opening_date character varying(255) COLLATE pg_catalog."default",
-    registration_status smallint,
-    size smallint,
-    telephone character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT company_pkey PRIMARY KEY (id),
-    CONSTRAINT company_registration_status_check CHECK (registration_status >= 0 AND registration_status <= '-1'::integer),
-    CONSTRAINT company_size_check CHECK (size >= 0 AND size <= 2)
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.company
-    OWNER to postgres;
-
-
-
--- address
-
-CREATE TABLE IF NOT EXISTS public.address
-(
-    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    additional_address_data character varying(255) COLLATE pg_catalog."default",
-    city character varying(255) COLLATE pg_catalog."default",
-    company_id character varying(255) COLLATE pg_catalog."default",
-    country character varying(255) COLLATE pg_catalog."default",
-    "number" character varying(255) COLLATE pg_catalog."default",
-    state character varying(255) COLLATE pg_catalog."default",
-    street character varying(255) COLLATE pg_catalog."default",
-    zip_code character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT address_pkey PRIMARY KEY (id)
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.address
-    OWNER to postgres;
-
-
--- company_account
-
-CREATE TABLE IF NOT EXISTS public.company_account
-(
-    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    agency character varying(255) COLLATE pg_catalog."default",
-    balance numeric(38,2),
-    company_id character varying(255) COLLATE pg_catalog."default",
-    institution character varying(255) COLLATE pg_catalog."default",
-    "number" character varying(255) COLLATE pg_catalog."default",
-    opening_date timestamp(6) without time zone,
-    type character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT company_account_pkey PRIMARY KEY (id)
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.company_account
-    OWNER to postgres;
-
-
-
---products
-
-CREATE TABLE IF NOT EXISTS public.tb_products
-(
-    id_product uuid NOT NULL,
-    name character varying(255) COLLATE pg_catalog."default",
-    value numeric(38,2),
-    CONSTRAINT tb_products_pkey PRIMARY KEY (id_product)
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.tb_products
-    OWNER to postgres;
-
-
---transaction
-
-CREATE TABLE IF NOT EXISTS public.transaction
-(
-    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    amount numeric(38,2),
-    category smallint,
-    date_time timestamp(6) without time zone,
-    description character varying(255) COLLATE pg_catalog."default",
-    new_balance numeric(38,2),
-    payment_method smallint,
-    previous_balance numeric(38,2),
-    receiver_id character varying(255) COLLATE pg_catalog."default",
-    sender_id character varying(255) COLLATE pg_catalog."default",
-    status smallint,
-    type smallint,
-    CONSTRAINT transaction_pkey PRIMARY KEY (id),
-    CONSTRAINT transaction_category_check CHECK (category >= 0 AND category <= '-1'::integer),
-    CONSTRAINT transaction_payment_method_check CHECK (payment_method >= 0 AND payment_method <= '-1'::integer),
-    CONSTRAINT transaction_status_check CHECK (status >= 0 AND status <= '-1'::integer),
-    CONSTRAINT transaction_type_check CHECK (type >= 0 AND type <= '-1'::integer)
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.transaction
-    OWNER to postgres;
+----company
+--
+--CREATE TABLE IF NOT EXISTS public.company
+--(
+--    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
+--    cnae character varying(255) COLLATE pg_catalog."default",
+--    cnpj character varying(255) COLLATE pg_catalog."default",
+--    email character varying(255) COLLATE pg_catalog."default",
+--    name character varying(255) COLLATE pg_catalog."default",
+--    pj_opening_date character varying(255) COLLATE pg_catalog."default",
+--    registration_status smallint,
+--    size smallint,
+--    telephone character varying(255) COLLATE pg_catalog."default",
+--    CONSTRAINT company_pkey PRIMARY KEY (id),
+--    CONSTRAINT company_registration_status_check CHECK (registration_status >= 0 AND registration_status <= '-1'::integer),
+--    CONSTRAINT company_size_check CHECK (size >= 0 AND size <= 2)
+--)
+--
+--TABLESPACE pg_default;
+--
+--ALTER TABLE IF EXISTS public.company
+--    OWNER to postgres;
+--
+--
+--
+---- address
+--
+--CREATE TABLE IF NOT EXISTS public.address
+--(
+--    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
+--    additional_address_data character varying(255) COLLATE pg_catalog."default",
+--    city character varying(255) COLLATE pg_catalog."default",
+--    company_id character varying(255) COLLATE pg_catalog."default",
+--    country character varying(255) COLLATE pg_catalog."default",
+--    "number" character varying(255) COLLATE pg_catalog."default",
+--    state character varying(255) COLLATE pg_catalog."default",
+--    street character varying(255) COLLATE pg_catalog."default",
+--    zip_code character varying(255) COLLATE pg_catalog."default",
+--    CONSTRAINT address_pkey PRIMARY KEY (id)
+--)
+--
+--TABLESPACE pg_default;
+--
+--ALTER TABLE IF EXISTS public.address
+--    OWNER to postgres;
+--
+--
+---- company_account
+--
+--CREATE TABLE IF NOT EXISTS public.company_account
+--(
+--    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
+--    agency character varying(255) COLLATE pg_catalog."default",
+--    balance numeric(38,2),
+--    company_id character varying(255) COLLATE pg_catalog."default",
+--    institution character varying(255) COLLATE pg_catalog."default",
+--    "number" character varying(255) COLLATE pg_catalog."default",
+--    opening_date timestamp(6) without time zone,
+--    type character varying(255) COLLATE pg_catalog."default",
+--    CONSTRAINT company_account_pkey PRIMARY KEY (id)
+--)
+--
+--TABLESPACE pg_default;
+--
+--ALTER TABLE IF EXISTS public.company_account
+--    OWNER to postgres;
+--
+--
+--
+----products
+--
+--CREATE TABLE IF NOT EXISTS public.tb_products
+--(
+--    id_product uuid NOT NULL,
+--    name character varying(255) COLLATE pg_catalog."default",
+--    value numeric(38,2),
+--    CONSTRAINT tb_products_pkey PRIMARY KEY (id_product)
+--)
+--
+--TABLESPACE pg_default;
+--
+--ALTER TABLE IF EXISTS public.tb_products
+--    OWNER to postgres;
+--
+--
+----transaction
+--
+--CREATE TABLE IF NOT EXISTS public.transaction
+--(
+--    id character varying(255) COLLATE pg_catalog."default" NOT NULL,
+--    amount numeric(38,2),
+--    category smallint,
+--    date_time timestamp(6) without time zone,
+--    description character varying(255) COLLATE pg_catalog."default",
+--    new_balance numeric(38,2),
+--    payment_method smallint,
+--    previous_balance numeric(38,2),
+--    receiver_id character varying(255) COLLATE pg_catalog."default",
+--    sender_id character varying(255) COLLATE pg_catalog."default",
+--    status smallint,
+--    type smallint,
+--    CONSTRAINT transaction_pkey PRIMARY KEY (id),
+--    CONSTRAINT transaction_category_check CHECK (category >= 0 AND category <= '-1'::integer),
+--    CONSTRAINT transaction_payment_method_check CHECK (payment_method >= 0 AND payment_method <= '-1'::integer),
+--    CONSTRAINT transaction_status_check CHECK (status >= 0 AND status <= '-1'::integer),
+--    CONSTRAINT transaction_type_check CHECK (type >= 0 AND type <= '-1'::integer)
+--)
+--
+--TABLESPACE pg_default;
+--
+--ALTER TABLE IF EXISTS public.transaction
+--    OWNER to postgres;

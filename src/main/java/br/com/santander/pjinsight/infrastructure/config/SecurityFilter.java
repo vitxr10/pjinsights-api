@@ -1,7 +1,7 @@
 package br.com.santander.pjinsight.infrastructure.config;
 
 import br.com.santander.pjinsight.infrastructure.repository.UserRepository;
-import br.com.santander.pjinsight.infrastructure.service.TokenService;
+import br.com.santander.pjinsight.infrastructure.service.auth.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package br.com.santander.pjinsight.infrastructure.service;
+package br.com.santander.pjinsight.infrastructure.service.auth;
 
 import br.com.santander.pjinsight.domain.entity.User;
 import com.auth0.jwt.JWT;

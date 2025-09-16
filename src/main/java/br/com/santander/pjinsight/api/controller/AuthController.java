@@ -7,7 +7,7 @@ import br.com.santander.pjinsight.application.model.response.RegisterResponse;
 import br.com.santander.pjinsight.domain.entity.User;
 import br.com.santander.pjinsight.infrastructure.repository.UserRepository;
 import br.com.santander.pjinsight.application.service.AuthorizationService;
-import br.com.santander.pjinsight.infrastructure.service.TokenService;
+import br.com.santander.pjinsight.infrastructure.service.auth.TokenService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

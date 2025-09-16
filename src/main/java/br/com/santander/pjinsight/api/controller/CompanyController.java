@@ -3,6 +3,7 @@ package br.com.santander.pjinsight.api.controller;
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
 import br.com.santander.pjinsight.application.service.CompanyService;
+import br.com.santander.pjinsight.infrastructure.service.profileclassifier.ProfileClassifierService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<CompanyResponse> insert(@RequestBody  CompanyRequest request) {
+    public ResponseEntity<CompanyResponse> insert(@RequestBody CompanyRequest request) {
         var company = companyService.save(request);
         return new ResponseEntity<>(company,HttpStatus.CREATED);
     }
@@ -43,11 +44,16 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping
-    public ResponseEntity<CompanyResponse> update(@RequestBody @Valid CompanyRequest request) {
-        var entity = companyService.update(request);
-        return new ResponseEntity<>(entity, HttpStatus.MOVED_PERMANENTLY);
+    @PatchMapping("/{cnpj}")
+    public ResponseEntity<Void> classifyCompany(@PathVariable("cnpj") String cnpj){
+        companyService.classifyCompany(cnpj);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CompanyResponse> update(@RequestBody @Valid CompanyRequest request, @PathVariable("id") UUID companyId) {
+        var entity = companyService.update(request,companyId);
+        return new ResponseEntity<>(entity, HttpStatus.OK);
 
     }
 

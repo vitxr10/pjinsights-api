@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -18,28 +20,15 @@ public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    private String name;
-
     private String cnpj;
-
-    private String pjOpeningDate;
-
+    private String name;
+    private BigDecimal totalInvoicing;
+    private BigDecimal totalBalance;
+    private LocalDate openingDate;
     private String cnae;
-
     private String email;
-
     private String telephone;
-
-    @Enumerated(EnumType.STRING)
-    private SizeEnum size;
-
-    @Enumerated(EnumType.STRING)
-    private RegistrationStatusEnum registrationStatus;
-
-//    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-//    private Set<Address> addressList;
-
+    private String profile;
 
 }
 

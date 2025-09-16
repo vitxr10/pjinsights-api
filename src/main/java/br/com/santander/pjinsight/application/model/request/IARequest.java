@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IARequest {
-    String cnpj;
-    String prompt;
+    private String prompt;
 }
