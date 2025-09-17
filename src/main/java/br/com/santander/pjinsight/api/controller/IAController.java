@@ -16,11 +16,11 @@ import java.util.Map;
 @AllArgsConstructor
 public class IAController{
 
-    private final AIService geminiService;
+    private final AIService iaService;
 
     @PostMapping("/generateFromPrompt")
     public ResponseEntity<IAResponse> generateFromPrompt(@RequestBody IARequest promptRequest) {
-        var report = geminiService.generateCompanyLifeMomentReport(promptRequest);
+        var report = iaService.generateCompanyLifeMomentReport(promptRequest);
         return ResponseEntity.status(HttpStatus.OK).body(report);
     }
 

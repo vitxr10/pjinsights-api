@@ -1,14 +1,21 @@
 package br.com.santander.pjinsight.api.controller;
 
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
+import br.com.santander.pjinsight.application.model.request.MultipartRequest;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
 import br.com.santander.pjinsight.application.service.CompanyService;
-import br.com.santander.pjinsight.infrastructure.service.profileclassifier.ProfileClassifierService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +27,16 @@ public class CompanyController {
 
     private CompanyService companyService;
 
-    @GetMapping
-    public ResponseEntity<List<CompanyResponse>> findAll(){
-        var companyResponse = companyService.findAll();
-        return new ResponseEntity<List<CompanyResponse>>(companyResponse,HttpStatus.OK);
+    @GetMapping()
+    public ResponseEntity<Page<CompanyResponse>> findAll(@RequestParam("page")Integer page){
+        var companyResponse = companyService.findAll(page);
+        return new ResponseEntity<>(companyResponse,HttpStatus.OK);
+    }
+
+    @GetMapping("/classified")
+    public ResponseEntity<Page<CompanyResponse>> findAllClassifiedCompanies(@RequestParam("page")Integer page){
+        var companyResponse = companyService.findAllClassifiedCompanies(page);
+        return ResponseEntity.status(HttpStatus.OK).body(companyResponse);
     }
 
     @GetMapping("/{id}")
@@ -46,7 +59,7 @@ public class CompanyController {
 
     @PatchMapping("/{cnpj}")
     public ResponseEntity<Void> classifyCompany(@PathVariable("cnpj") String cnpj){
-        companyService.classifyCompany(cnpj);
+        companyService.classifyCompanies(List.of(cnpj));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -55,6 +68,21 @@ public class CompanyController {
         var entity = companyService.update(request,companyId);
         return new ResponseEntity<>(entity, HttpStatus.OK);
 
+    }
+
+
+    @PostMapping(
+            value = "/classify/batch",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<Void> classifyBatch(
+            @Parameter(description = "Arquivo CSV ou Excel contendo os CNPJs",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(type = "string", format = "binary")))
+            @RequestParam("file") MultipartRequest file
+    ) {
+        companyService.classifyBatch(file.getMultipartFile());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 

@@ -9,14 +9,24 @@ import br.com.santander.pjinsight.infrastructure.service.profileclassifier.Profi
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -39,10 +49,14 @@ public class CompanyService {
         return objectMapper.convertValue(company, CompanyResponse.class);
     }
 
-    public List<CompanyResponse> findAll() {
-        return repository.findAll().stream()
-                .map(company -> objectMapper.convertValue(company, CompanyResponse.class))
-                .collect(Collectors.toList());
+    public Page<CompanyResponse> findAll(Integer page) {
+        var pageable = PageRequest.of(page, 10);
+        return repository.findAll(pageable)
+                .map(company -> {
+                    var companyResponse = new CompanyResponse();
+                    BeanUtils.copyProperties(company, companyResponse);
+                    return companyResponse;
+                });
     }
 
     @Transactional
@@ -53,11 +67,11 @@ public class CompanyService {
     }
 
     @Transactional
-    public CompanyResponse deleteById(UUID id) {
+    public void deleteById(UUID id) {
         Company company = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         repository.deleteById(id);
-        return objectMapper.convertValue(company, CompanyResponse.class);
+        objectMapper.convertValue(company, CompanyResponse.class);
     }
 
     private void setCompany(Company company, CompanyRequest req) {
@@ -65,14 +79,108 @@ public class CompanyService {
     }
 
     @Transactional
-    public void classifyCompany(String cnpj) {
-        var company = repository.findByCnpj(cnpj);
-        var profileClassifierRequest = new ProfileClassifierRequest();
-        BeanUtils.copyProperties(company,profileClassifierRequest);
-        profileClassifierRequest.setOpeningDate(company.getOpeningDate().toString());
-        var profileClassifierRequestList = new ArrayList<ProfileClassifierRequest>();
-        profileClassifierRequestList.add(profileClassifierRequest);
-        var profileClassifierResponse = profileClassifierService.classifyText(profileClassifierRequestList);
-        company.setProfile(profileClassifierResponse.get(0).getProfile());
+    public void classifyCompanies(List<String> cnpjs) {
+        var companies = repository.findByCnpjIn(cnpjs);
+
+        var requests = companies.stream()
+                .map(company -> {
+                    var request = new ProfileClassifierRequest();
+                    BeanUtils.copyProperties(company, request);
+                    request.setOpeningDate(company.getOpeningDate().toString());
+                    return request;
+                })
+                .toList();
+
+        var responses = profileClassifierService.classifyText(requests);
+
+        for (int i = 0; i < companies.size(); i++) {
+            var company = companies.get(i);
+            var response = responses.get(i);
+            company.setProfile(response.getProfile());
+        }
+    }
+
+    public Page<CompanyResponse> findAllClassifiedCompanies(Integer page) {
+        var pageable = PageRequest.of(page, 10);
+        Page<Company> companies = repository.findAll(pageable);
+
+        List<CompanyResponse> classifiedCompanies = companies.stream()
+                .filter(this::hasValidProfile)
+                .map(this::toResponse)
+                .toList();
+
+        return new PageImpl<>(classifiedCompanies, pageable, classifiedCompanies.size());
+    }
+
+    private boolean hasValidProfile(Company company) {
+        return company.getProfile() != null && !company.getProfile().isBlank();
+    }
+
+    private CompanyResponse toResponse(Company company) {
+        var response = new CompanyResponse();
+        BeanUtils.copyProperties(company, response);
+        return response;
+    }
+
+    public void classifyBatch(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            String fileName = file.getOriginalFilename();
+
+            if (fileName != null && fileName.endsWith(".csv")) {
+                processCsv(inputStream);
+            } else if (fileName != null && (fileName.endsWith(".xlsx") || fileName.endsWith(".xls"))) {
+                processExcel(inputStream);
+            } else {
+                throw new IllegalArgumentException("Formato de arquivo não suportado: " + fileName);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao processar arquivo", e);
+        }
+    }
+
+    private void processCsv(InputStream inputStream) {
+        try (CSVParser parser = CSVFormat.DEFAULT
+                .withFirstRecordAsHeader()
+                .parse(new java.io.InputStreamReader(inputStream))) {
+
+            Map<String, Integer> headerMap = parser.getHeaderMap();
+            String cnpjHeader = headerMap.keySet().stream()
+                    .filter(h -> h.equalsIgnoreCase("cnpj"))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Coluna CNPJ não encontrada no CSV"));
+
+            List<String> cnpjs = parser.getRecords().stream()
+                    .map(record -> record.get(cnpjHeader))
+                    .filter(s -> s != null && !s.isBlank())
+                    .map(String::trim)
+                    .toList();
+
+            classifyCompanies(cnpjs);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao processar CSV", e);
+        }
+    }
+
+    private void processExcel(InputStream inputStream) {
+        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0); // primeira aba do Excel
+            List<String> cnpjs = new ArrayList<>();
+
+            int cnpjColumnIndex = 2;
+
+            sheet.forEach(row -> {
+                if (row.getRowNum() == 0) return; // pula header
+                var cell = row.getCell(cnpjColumnIndex);
+                if (cell != null) {
+                    String cnpj = cell.getStringCellValue().trim();
+                    if (!cnpj.isBlank()) cnpjs.add(cnpj);
+                }
+            });
+
+            classifyCompanies(cnpjs);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao processar Excel", e);
+        }
     }
 }
