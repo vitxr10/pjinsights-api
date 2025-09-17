@@ -1,4 +1,4 @@
-package br.com.santander.pjinsight.application.model.request;
+package br.com.santander.pjinsight.infrastructure.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class IARequest {
-    private String prompt;
+public class AIResponse {
+    String chatResponse;
 }

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://ep-red-unit-ad718262-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
-    username: neondb_owner
-    password: npg_w0OBoDYizb9J
+    url:
+    username:
+    password:
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -23,10 +23,10 @@ logging:
 api:
   security:
     token:
-      secret: pjinsights1234567
+      secret:
 
 aws:
   api:
     profile-classifier:
-      url: "https://1r4rllo8ff.execute-api.sa-east-1.amazonaws.com/Prod"
+      url:
 

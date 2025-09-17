@@ -91,7 +91,7 @@ public class CompanyService {
                 })
                 .toList();
 
-        var responses = profileClassifierService.classifyText(requests);
+        var responses = profileClassifierService.classifyProfile(requests);
 
         for (int i = 0; i < companies.size(); i++) {
             var company = companies.get(i);

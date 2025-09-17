@@ -1,7 +1,6 @@
 package br.com.santander.pjinsight.api.controller;
 
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
-import br.com.santander.pjinsight.application.model.request.MultipartRequest;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
 import br.com.santander.pjinsight.application.service.CompanyService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,7 +32,7 @@ public class CompanyController {
     }
 
     @GetMapping("/classified")
-    public ResponseEntity<Page<CompanyResponse>> findAllClassifiedCompanies(@RequestParam("page")Integer page){
+    public ResponseEntity<Page<CompanyResponse>> findAllClassified(@RequestParam("page")Integer page){
         var companyResponse = companyService.findAllClassifiedCompanies(page);
         return ResponseEntity.status(HttpStatus.OK).body(companyResponse);
     }
@@ -57,8 +55,8 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping("/{cnpj}")
-    public ResponseEntity<Void> classifyCompany(@PathVariable("cnpj") String cnpj){
+    @PatchMapping("/classify/{cnpj}")
+    public ResponseEntity<Void> classify(@PathVariable("cnpj") String cnpj){
         companyService.classifyCompanies(List.of(cnpj));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -70,15 +68,13 @@ public class CompanyController {
 
     }
 
-
     @PostMapping(
             value = "/classify/batch",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<Void> classifyBatch(
             @Parameter(description = "Arquivo CSV ou Excel contendo os CNPJs",
-                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                            schema = @Schema(type = "string", format = "binary")))
+            content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE, schema = @Schema(type = "string", format = "binary")))
             @RequestPart("file") MultipartFile file
     ) {
         companyService.classifyBatch(file);

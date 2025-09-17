@@ -1,8 +1,8 @@
 package br.com.santander.pjinsight.api.controller;
 
-import br.com.santander.pjinsight.application.model.request.LoginRequestDTO;
+import br.com.santander.pjinsight.application.model.request.LoginRequest;
 import br.com.santander.pjinsight.application.model.request.RegisterRequest;
-import br.com.santander.pjinsight.application.model.response.LoginResponseDTO;
+import br.com.santander.pjinsight.application.model.response.LoginResponse;
 import br.com.santander.pjinsight.application.model.response.RegisterResponse;
 import br.com.santander.pjinsight.domain.entity.User;
 import br.com.santander.pjinsight.infrastructure.repository.UserRepository;
@@ -32,11 +32,12 @@ public class AuthController {
     AuthorizationService authorizationService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO data) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.getLogin(), data.getPassword());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((User) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+
+        return ResponseEntity.ok(new LoginResponse(token));
 
     }
 
