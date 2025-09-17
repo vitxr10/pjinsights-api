@@ -79,11 +79,9 @@ public class CompanyController {
             @Parameter(description = "Arquivo CSV ou Excel contendo os CNPJs",
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                             schema = @Schema(type = "string", format = "binary")))
-            @RequestParam("file") MultipartRequest file
+            @RequestPart("file") MultipartFile file
     ) {
-        companyService.classifyBatch(file.getMultipartFile());
+        companyService.classifyBatch(file);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
 
-
-}
+}}
