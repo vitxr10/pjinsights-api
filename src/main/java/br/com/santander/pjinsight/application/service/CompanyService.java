@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class CompanyService {
 
     private final CompanyRepository repository;
     private ProfileClassifierService profileClassifierService;
-    private final ObjectMapper objectMapper; // Jackson sendo injetado
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public CompanyResponse save(CompanyRequest CompanyRequest) {
@@ -98,6 +99,8 @@ public class CompanyService {
             var response = responses.get(i);
             company.setProfile(response.getProfile());
         }
+
+        repository.saveAll(companies);
     }
 
     public Page<CompanyResponse> findAllClassifiedCompanies(Integer page) {
@@ -163,16 +166,20 @@ public class CompanyService {
 
     private void processExcel(InputStream inputStream) {
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0); // primeira aba do Excel
+            Sheet sheet = workbook.getSheetAt(0);
             List<String> cnpjs = new ArrayList<>();
 
-            int cnpjColumnIndex = 2;
+            int cnpjColumnIndex = 0;
 
             sheet.forEach(row -> {
-                if (row.getRowNum() == 0) return; // pula header
+                if (row.getRowNum() == 0) return;
                 var cell = row.getCell(cnpjColumnIndex);
                 if (cell != null) {
-                    String cnpj = cell.getStringCellValue().trim();
+                    String cnpj = switch (cell.getCellType()) {
+                        case STRING -> cell.getStringCellValue().trim();
+                        case NUMERIC -> String.valueOf(new BigDecimal(cell.getNumericCellValue()).toBigInteger());
+                        default -> "";
+                    };
                     if (!cnpj.isBlank()) cnpjs.add(cnpj);
                 }
             });
