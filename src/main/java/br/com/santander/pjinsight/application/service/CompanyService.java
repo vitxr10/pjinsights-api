@@ -105,14 +105,9 @@ public class CompanyService {
 
     public Page<CompanyResponse> findAllClassifiedCompanies(Integer page) {
         var pageable = PageRequest.of(page, 10);
-        Page<Company> companies = repository.findAll(pageable);
 
-        List<CompanyResponse> classifiedCompanies = companies.stream()
-                .filter(this::hasValidProfile)
-                .map(this::toResponse)
-                .toList();
-
-        return new PageImpl<>(classifiedCompanies, pageable, classifiedCompanies.size());
+        return repository.findAllClassified(pageable)
+                .map(this::toResponse);
     }
 
     private boolean hasValidProfile(Company company) {
