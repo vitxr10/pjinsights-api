@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,7 +105,7 @@ public class CompanyService {
     }
 
     public Page<CompanyResponse> findAllClassifiedCompanies(Integer page) {
-        var pageable = PageRequest.of(page, 10);
+        var pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.ASC));
 
         return repository.findAllClassified(pageable)
                 .map(this::toResponse);
@@ -184,5 +185,12 @@ public class CompanyService {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao processar Excel", e);
         }
+    }
+
+    public CompanyResponse findByCnpj(String cnpj) {
+        Company company = repository.findByCnpj(cnpj);
+        CompanyResponse companyResponse = new CompanyResponse();
+        BeanUtils.copyProperties(company,companyResponse);
+        return companyResponse;
     }
 }

@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Data
 public class CompanyRequest {
     private String cnpj;
+    private String name;
     private BigDecimal totalInvoicing;
     private BigDecimal totalBalance;
     private LocalDate openingDate;
@@ -15,3 +16,4 @@ public class CompanyRequest {
     private String email;
     private String telephone;
 }
+

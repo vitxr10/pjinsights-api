@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Data
 public class CompanyResponse {
     private String cnpj;
+    private String name;
     private BigDecimal totalInvoicing;
     private BigDecimal totalBalance;
     private LocalDate openingDate;
