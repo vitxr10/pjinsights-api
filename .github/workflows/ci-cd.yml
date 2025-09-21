@@ -32,4 +32,4 @@ jobs:
           version_label: ${{ github.sha }}
           region: ${{ secrets.AWS_REGION }}
           deployment_package: target/pjinsight-0.0.1-SNAPSHOT.jar
-          existing_bucket_name: elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.ACCOUNT_ID }}
+          existing_bucket_name: ${{ secrets.BUCKET_NAME }}
