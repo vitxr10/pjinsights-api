@@ -22,7 +22,7 @@ public class AuthorizationService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private ObjectMapper objectMapper; // Jackson sendo injetado
+    private ObjectMapper objectMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
