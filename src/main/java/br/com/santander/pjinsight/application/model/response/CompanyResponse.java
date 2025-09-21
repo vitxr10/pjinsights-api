@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class CompanyResponse {
@@ -16,4 +17,5 @@ public class CompanyResponse {
     private String email;
     private String telephone;
     private String profile;
+    private LocalDateTime classificationDate;
 }

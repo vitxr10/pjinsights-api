@@ -3,17 +3,12 @@ package br.com.santander.pjinsight.api.controller;
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
 import br.com.santander.pjinsight.application.service.CompanyService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -62,7 +57,7 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{cnpj}")
+    @GetMapping("/cnpj/{cnpj}")
     public ResponseEntity<CompanyResponse> findCompanyByCnpj(@PathVariable("cnpj") String cnpj){
         CompanyResponse companyResponse = companyService.findByCnpj(cnpj);
         return ResponseEntity.status(HttpStatus.OK).body(companyResponse);
@@ -74,17 +69,4 @@ public class CompanyController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
 
     }
-
-    @PostMapping(
-            value = "/classify/batch",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public ResponseEntity<Void> classifyBatch(
-            @Parameter(description = "Arquivo CSV ou Excel contendo os CNPJs",
-            content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE, schema = @Schema(type = "string", format = "binary")))
-            @RequestPart("file") MultipartFile file
-    ) {
-        companyService.classifyBatch(file);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
-}}
+ }
