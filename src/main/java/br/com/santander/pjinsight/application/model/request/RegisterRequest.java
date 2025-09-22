@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequest {
-
     private String login;
     private String password;
-    private UserRoleEnum role;
-
 }
