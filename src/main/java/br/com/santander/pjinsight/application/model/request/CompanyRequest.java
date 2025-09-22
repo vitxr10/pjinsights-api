@@ -15,5 +15,6 @@ public class CompanyRequest {
     private String cnae;
     private String email;
     private String telephone;
+    private AddressRequest address;
 }
 

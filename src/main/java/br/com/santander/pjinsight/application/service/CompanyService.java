@@ -27,11 +27,13 @@ public class CompanyService {
     private final CompanyRepository repository;
     private ProfileClassifierService profileClassifierService;
     private final ObjectMapper objectMapper;
+    private final AddressService addressService;
 
     @Transactional
-    public CompanyResponse save(CompanyRequest CompanyRequest) {
-        Company company = objectMapper.convertValue(CompanyRequest, Company.class);
-        repository.save(company);
+    public CompanyResponse save(CompanyRequest companyRequest) {
+        Company company = objectMapper.convertValue(companyRequest, Company.class);
+        company = repository.save(company);
+        addressService.save(companyRequest.getAddress(),company.getId());
         return objectMapper.convertValue(company, CompanyResponse.class);
     }
 

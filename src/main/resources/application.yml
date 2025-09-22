@@ -1,11 +1,11 @@
 server:
-  port: ${PORT}
+  port: ${PORT:8080}
 
 spring:
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: ${DATABASE_URL:jdbc:postgresql://ep-red-unit-ad718262-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require}
+    username: ${DATABASE_USERNAME:neondb_owner}
+    password: ${DATABASE_PASSWORD:npg_w0OBoDYizb9J}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -26,15 +26,13 @@ logging:
 api:
   security:
     token:
-      secret: ${JWT_SECRET}
+      secret: ${JWT_SECRET:pjinsights1234567}
 
 aws:
   api:
     profile-classifier:
-      url: ${PROFILE_CLASSIFIER_URL}
+      url: ${PROFILE_CLASSIFIER_URL:https://1r4rllo8ff.execute-api.sa-east-1.amazonaws.com/Prod}
 
 ai:
-  model: ${AI_MODEL}
-  apikey: ${AI_API_KEY}
-
-
+  model: ${AI_MODEL:gemini-1.5-flash}
+  apikey: ${AI_API_KEY:AIzaSyCAtbbqFJ-bV-E56u8eWyc6qtMmMClOchI}

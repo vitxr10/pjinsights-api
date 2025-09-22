@@ -44,7 +44,4 @@ public class AddressRequest {
     @Size(max = 10, message = "Número deve ter até 10 caracteres")
     private String number;
 
-    @NotBlank(message = "ID da empresa é obrigatório")
-    @Pattern(regexp = "^[0-9a-fA-F\\-]{36}$", message = "ID da empresa deve ser um UUID válido")
-    private UUID companyId;
 }

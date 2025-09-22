@@ -18,10 +18,11 @@ import java.util.stream.Collectors;
 public class AddressService {
 
     private final AddressRepository repository;
-    private final ObjectMapper objectMapper; // injetado pelo Spring
+    private final ObjectMapper objectMapper;
 
-    public AddressResponse save(AddressRequest addressRequest){
+    public AddressResponse save(AddressRequest addressRequest,UUID companyId){
         Address address = objectMapper.convertValue(addressRequest, Address.class);
+        address.setCompanyId(companyId);
         repository.save(address);
         return objectMapper.convertValue(address, AddressResponse.class);
     }
@@ -57,6 +58,6 @@ public class AddressService {
         address.setStreet(addressRequest.getStreet());
         address.setZipCode(addressRequest.getZipCode());
         address.setState(addressRequest.getState());
-        address.setCompanyId(addressRequest.getCompanyId());
+
     }
 }

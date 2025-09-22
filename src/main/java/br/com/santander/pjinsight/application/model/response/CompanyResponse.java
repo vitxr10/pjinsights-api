@@ -18,4 +18,5 @@ public class CompanyResponse {
     private String telephone;
     private String profile;
     private LocalDateTime classificationDate;
+    private AddressResponse addressResponse;
 }
