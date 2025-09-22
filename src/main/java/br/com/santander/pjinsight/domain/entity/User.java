@@ -1,9 +1,7 @@
 package br.com.santander.pjinsight.domain.entity;
 
-import br.com.santander.pjinsight.domain.enums.UserRoleEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +13,6 @@ import java.util.List;
 
 @Entity(name = "users")
 @Table(name = "users")
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -29,20 +26,14 @@ public class User implements UserDetails {
 
     private String password;
 
-    private UserRoleEnum role;
-
-    public User(String login, String password, UserRoleEnum role) {
+    public User(String login, String password) {
         this.login = login;
         this.password = password;
-        this.role = role;
     }
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == UserRoleEnum.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
-        else return  List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            return  List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
@@ -69,6 +60,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 }

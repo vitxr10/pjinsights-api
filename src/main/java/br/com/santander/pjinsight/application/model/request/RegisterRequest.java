@@ -1,6 +1,5 @@
 package br.com.santander.pjinsight.application.model.request;
 
-import br.com.santander.pjinsight.domain.enums.UserRoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

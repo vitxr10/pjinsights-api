@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class AuthController {
 
-
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private TokenService tokenService;
@@ -36,7 +35,6 @@ public class AuthController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.getLogin(), data.getPassword());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((User) auth.getPrincipal());
-
         return ResponseEntity.ok(new LoginResponse(token));
 
     }

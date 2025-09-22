@@ -34,13 +34,11 @@ public class AuthorizationService implements UserDetailsService {
 
         User newUser = new User(
                 registerRequest.getLogin(),
-                encryptedPassword,
-                registerRequest.getRole()
+                encryptedPassword
         );
 
         newUser = this.userRepository.save(newUser);
 
-        // Conversão direta com Jackson
         return objectMapper.convertValue(newUser, RegisterResponse.class);
     }
 }
