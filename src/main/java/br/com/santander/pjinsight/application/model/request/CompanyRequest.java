@@ -16,5 +16,7 @@ public class CompanyRequest {
     private String email;
     private String telephone;
     private AddressRequest address;
+    private BalanceRequest balanceRequest;
+    private InvoiceRequest invoiceRequest;
 }
 

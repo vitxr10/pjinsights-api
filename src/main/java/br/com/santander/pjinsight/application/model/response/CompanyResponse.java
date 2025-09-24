@@ -1,11 +1,15 @@
 package br.com.santander.pjinsight.application.model.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class CompanyResponse {
     private String cnpj;
@@ -19,4 +23,6 @@ public class CompanyResponse {
     private String profile;
     private LocalDateTime classificationDate;
     private AddressResponse addressResponse;
+    private BalanceResponse balanceResponse;
+    private InvoiceResponse invoiceResponse;
 }

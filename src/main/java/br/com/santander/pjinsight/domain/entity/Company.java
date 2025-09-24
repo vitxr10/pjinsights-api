@@ -31,6 +31,8 @@ public class Company {
     private String telephone;
     private String profile;
     private LocalDateTime classificationDate;
-
+    private Double cresmentoSaldo5Meses; //TODO traduzir para ing
+    private BigDecimal receitaMediaMensal; //TODO traduzir para ing
+    private Double crescimentoTransacoes; //TODO traduzir para ing
 }
 
