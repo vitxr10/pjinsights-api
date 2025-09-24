@@ -1,7 +1,10 @@
 package br.com.santander.pjinsight.application.service;
 
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
+import br.com.santander.pjinsight.application.model.response.AddressResponse;
+import br.com.santander.pjinsight.application.model.response.BalanceResponse;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
+import br.com.santander.pjinsight.application.model.response.InvoiceResponse;
 import br.com.santander.pjinsight.domain.entity.Company;
 import br.com.santander.pjinsight.infrastructure.dto.request.ProfileClassifierRequest;
 import br.com.santander.pjinsight.infrastructure.repository.CompanyRepository;
@@ -28,13 +31,22 @@ public class CompanyService {
     private ProfileClassifierService profileClassifierService;
     private final ObjectMapper objectMapper;
     private final AddressService addressService;
+    private final BalanceService balanceService;
+    private final InvoiceService invoiceService;
 
     @Transactional
     public CompanyResponse save(CompanyRequest companyRequest) {
         Company company = objectMapper.convertValue(companyRequest, Company.class);
         company = repository.save(company);
-        addressService.save(companyRequest.getAddress(),company.getId());
-        return objectMapper.convertValue(company, CompanyResponse.class);
+        BalanceResponse balanceResponse = balanceService.save(companyRequest.getBalance(),company.getId());
+        InvoiceResponse invoiceResponse = invoiceService.save(companyRequest.getInvoice(),company.getId());
+        AddressResponse addressResponse = addressService.save(companyRequest.getAddress(),company.getId());
+        CompanyResponse companyResponse = new CompanyResponse();
+        BeanUtils.copyProperties(company,companyResponse);
+        companyResponse.setAddress(addressResponse);
+        companyResponse.setInvoice(invoiceResponse);
+        companyResponse.setBalance(balanceResponse);
+        return companyResponse;
     }
 
     public CompanyResponse findById(UUID id) {
@@ -111,8 +123,10 @@ public class CompanyService {
 
     public CompanyResponse findByCnpj(String cnpj) {
         Company company = repository.findByCnpj(cnpj);
-        CompanyResponse companyResponse = new CompanyResponse();
-        BeanUtils.copyProperties(company,companyResponse);
+        CompanyResponse companyResponse = toResponse(company);
+        companyResponse.setAddress(addressService.findByCompanyId(company.getId()));
+        companyResponse.setInvoice(invoiceService.findByCompanyId(company.getId()));
+        companyResponse.setBalance(balanceService.findByCompanyId(company.getId()));
         return companyResponse;
     }
 }

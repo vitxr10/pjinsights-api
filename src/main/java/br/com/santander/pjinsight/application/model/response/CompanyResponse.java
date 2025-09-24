@@ -22,7 +22,7 @@ public class CompanyResponse {
     private String telephone;
     private String profile;
     private LocalDateTime classificationDate;
-    private AddressResponse addressResponse;
-    private BalanceResponse balanceResponse;
-    private InvoiceResponse invoiceResponse;
+    private AddressResponse address;
+    private BalanceResponse balance;
+    private InvoiceResponse invoice;
 }

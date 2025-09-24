@@ -7,5 +7,5 @@ import br.com.santander.pjinsight.domain.entity.Address;
 import java.util.UUID;
 
 public interface AddressRepository extends JpaRepository<Address, UUID> {
-    
+    Address findByCompanyId(UUID companyId);
 }

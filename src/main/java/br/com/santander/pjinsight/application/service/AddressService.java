@@ -7,6 +7,7 @@ import br.com.santander.pjinsight.infrastructure.repository.AddressRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +31,13 @@ public class AddressService {
     public AddressResponse findById(UUID id) {
         Address result = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         return objectMapper.convertValue(result, AddressResponse.class);
+    }
+
+    public AddressResponse findByCompanyId(UUID companyId) {
+        AddressResponse addressResponse = new AddressResponse();
+        Address address = repository.findByCompanyId(companyId);
+        BeanUtils.copyProperties(address,addressResponse);
+        return addressResponse;
     }
 
     public List<AddressResponse> findAll() {
