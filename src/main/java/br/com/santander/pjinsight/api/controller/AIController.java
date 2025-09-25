@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AIController {
 
     private final AIService aiService;
-
+//teste
     @PostMapping("/generate-from-prompt")
     public ResponseEntity<AIResponse> generateFromPrompt(@RequestBody AIRequest promptRequest) {
         var report = aiService.generateCompanyLifeMomentReport(promptRequest);
