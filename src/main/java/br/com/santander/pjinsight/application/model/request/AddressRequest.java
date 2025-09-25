@@ -7,15 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class AddressRequest {
-
-    private UUID id;
 
     @NotBlank(message = "Rua é obrigatória")
     @Size(max = 100, message = "Rua deve ter até 100 caracteres")
