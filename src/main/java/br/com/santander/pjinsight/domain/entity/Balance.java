@@ -19,7 +19,7 @@ public class Balance {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String month;
+    private Short month;
     private BigDecimal balanceValue;
     private UUID companyId;
 }

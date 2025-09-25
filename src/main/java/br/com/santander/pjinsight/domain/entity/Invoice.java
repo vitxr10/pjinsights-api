@@ -19,7 +19,7 @@ public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String month;
+    private Short month;
     private BigDecimal invoiceValue;
     private UUID companyId;
 }

@@ -10,6 +10,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Data
 public class BalanceResponse {
-    private String month;
+    private Short month;
     private BigDecimal balanceValue;
 }
