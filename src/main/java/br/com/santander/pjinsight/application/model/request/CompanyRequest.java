@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +21,7 @@ public class CompanyRequest {
     private String email;
     private String telephone;
     private AddressRequest address;
-    private BalanceRequest balance;
-    private InvoiceRequest invoice;
+    private List<BalanceRequest> balance;
+    private List<InvoiceRequest> invoice;
 }
 

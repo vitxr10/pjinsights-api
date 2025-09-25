@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,21 +22,28 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
 
     @Transactional
-    public InvoiceResponse save(InvoiceRequest invoiceRequest, UUID companyId) {
-        Invoice invoice = new Invoice();
-        BeanUtils.copyProperties(invoiceRequest,invoice);
-        invoice.setCompanyId(companyId);
-        invoice = invoiceRepository.save(invoice);
-        InvoiceResponse invoiceResponse = new InvoiceResponse();
-        BeanUtils.copyProperties(invoice,invoiceResponse);
-        return invoiceResponse;
+    public List<InvoiceResponse> save(List<InvoiceRequest> invoiceRequest, UUID companyId) {
+        return invoiceRequest.stream().map(
+                request -> {
+                    Invoice invoice = new Invoice();
+                    BeanUtils.copyProperties(request,invoice);
+                    invoice.setCompanyId(companyId);
+                    invoice = invoiceRepository.save(invoice);
+                    InvoiceResponse invoiceResponse = new InvoiceResponse();
+                    BeanUtils.copyProperties(invoice,invoiceResponse);
+                    return invoiceResponse;
+                }
+        ).toList();
     }
 
-    public InvoiceResponse findByCompanyId(UUID companyId) {
-        InvoiceResponse invoiceResponse = new InvoiceResponse();
-        Invoice invoice = invoiceRepository.findByCompanyId(companyId);
-        BeanUtils.copyProperties(invoice,invoiceResponse);
-        return invoiceResponse;
+    public List<InvoiceResponse> findByCompanyId(UUID companyId) {
+        return invoiceRepository.findByCompanyId(companyId).stream().map(
+                invoice -> {
+                    InvoiceResponse invoiceResponse = new InvoiceResponse();
+                    BeanUtils.copyProperties(invoice,invoiceResponse);
+                    return invoiceResponse;
+                }
+        ).toList();
     }
 
 }

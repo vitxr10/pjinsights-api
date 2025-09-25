@@ -38,8 +38,8 @@ public class CompanyService {
     public CompanyResponse save(CompanyRequest companyRequest) {
         Company company = objectMapper.convertValue(companyRequest, Company.class);
         company = repository.save(company);
-        BalanceResponse balanceResponse = balanceService.save(companyRequest.getBalance(),company.getId());
-        InvoiceResponse invoiceResponse = invoiceService.save(companyRequest.getInvoice(),company.getId());
+        List<BalanceResponse> balanceResponse = balanceService.save(companyRequest.getBalance(),company.getId());
+        List<InvoiceResponse> invoiceResponse = invoiceService.save(companyRequest.getInvoice(),company.getId());
         AddressResponse addressResponse = addressService.save(companyRequest.getAddress(),company.getId());
         CompanyResponse companyResponse = new CompanyResponse();
         BeanUtils.copyProperties(company,companyResponse);

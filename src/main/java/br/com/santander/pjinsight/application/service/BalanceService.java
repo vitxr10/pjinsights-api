@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -19,21 +20,28 @@ public class BalanceService {
     private final BalanceRepository balanceRepository;
 
     @Transactional
-    public BalanceResponse save(BalanceRequest balanceRequest, UUID companyId) {
-        Balance balance = new Balance();
-        BeanUtils.copyProperties(balanceRequest,balance);
-        balance.setCompanyId(companyId);
-        balance = balanceRepository.save(balance);
-        BalanceResponse balanceResponse = new BalanceResponse();
-        BeanUtils.copyProperties(balance,balanceResponse);
-        return balanceResponse;
+    public List<BalanceResponse> save(List<BalanceRequest> balanceRequest, UUID companyId) {
+        return balanceRequest.stream().map(
+              request -> {
+                  Balance balance = new Balance();
+                  BeanUtils.copyProperties(request,balance);
+                  balance.setCompanyId(companyId);
+                  balance = balanceRepository.save(balance);
+                  BalanceResponse balanceResponse = new BalanceResponse();
+                  BeanUtils.copyProperties(balance,balanceResponse);
+                  return balanceResponse;
+              }
+        ).toList();
     }
 
-    public BalanceResponse findByCompanyId(UUID companyId) {
-        BalanceResponse balanceResponse = new BalanceResponse();
-        Balance balance = balanceRepository.findByCompanyId(companyId);
-        BeanUtils.copyProperties(balance,balanceResponse);
-        return  balanceResponse;
+    public List<BalanceResponse> findByCompanyId(UUID companyId) {
+        return balanceRepository.findByCompanyId(companyId).stream().map(
+                balance -> {
+                    BalanceResponse balanceResponse = new BalanceResponse();
+                    BeanUtils.copyProperties(balance,balanceResponse);
+                    return  balanceResponse;
+                }
+        ).toList();
     }
 
 }
