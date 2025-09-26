@@ -26,5 +26,8 @@ public class CompanyResponse {
     private AddressResponse address;
     private List<BalanceResponse> balance;
     private List<InvoiceResponse> invoice;
+    private BigDecimal averageMonthlyInvoice;
+    private Double balanceGrowthLastFiveMonths;
+    private Double transactionGrowthLastThreeMonths;
 }
 

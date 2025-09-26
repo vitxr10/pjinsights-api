@@ -19,9 +19,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -124,9 +126,65 @@ public class CompanyService {
     public CompanyResponse findByCnpj(String cnpj) {
         Company company = repository.findByCnpj(cnpj);
         CompanyResponse companyResponse = toResponse(company);
+
         companyResponse.setAddress(addressService.findByCompanyId(company.getId()));
-        companyResponse.setInvoice(invoiceService.findByCompanyId(company.getId()));
-        companyResponse.setBalance(balanceService.findByCompanyId(company.getId()));
+        var invoices = invoiceService.findByCompanyId(company.getId());
+        var balances = balanceService.findByCompanyId(company.getId());
+
+        companyResponse.setInvoice(invoices);
+        companyResponse.setBalance(balances);
+
+        companyResponse.setAverageMonthlyInvoice(getAverageMonthlyInvoice(invoices));
+        companyResponse.setBalanceGrowthLastFiveMonths(getBalanceGrowthLastFiveMonths(balances));
+        companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthLastThreeMonths(invoices));
+
         return companyResponse;
+    }
+
+    public BigDecimal getAverageMonthlyInvoice(List<InvoiceResponse> invoices) {
+        if (invoices == null || invoices.isEmpty()) return BigDecimal.ZERO;
+
+        BigDecimal total = invoices.stream()
+                .map(InvoiceResponse::getInvoiceValue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return total.divide(BigDecimal.valueOf(invoices.size()), 2, RoundingMode.HALF_UP);
+    }
+
+    public Double getBalanceGrowthLastFiveMonths(List<BalanceResponse> balances) {
+        if (balances == null || balances.size() < 5) return 0.0;
+
+        List<BalanceResponse> sorted = new ArrayList<>(balances);
+        sorted.sort(Comparator.comparing(BalanceResponse::getMonth));
+
+        BigDecimal fiveMonthsAgo = sorted.get(sorted.size() - 5).getBalanceValue();
+        BigDecimal current = sorted.get(sorted.size() - 1).getBalanceValue();
+
+        if (fiveMonthsAgo.compareTo(BigDecimal.ZERO) == 0) return 0.0;
+
+        return current.subtract(fiveMonthsAgo)
+                .divide(fiveMonthsAgo, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                .doubleValue();
+    }
+
+
+    public Double getTransactionGrowthLastThreeMonths(List<InvoiceResponse> invoices) {
+        if (invoices == null || invoices.size() < 3) return 0.0;
+
+        Map<Short, Long> txByMonth = invoices.stream()
+                .collect(Collectors.groupingBy(InvoiceResponse::getMonth, Collectors.counting()));
+
+        List<Short> months = new ArrayList<>(txByMonth.keySet());
+        Collections.sort(months);
+
+        if (months.size() < 3) return 0.0;
+
+        Long past = txByMonth.get(months.get(months.size() - 3));
+        Long current = txByMonth.get(months.get(months.size() - 1));
+
+        if (past == null || past == 0) return 0.0;
+
+        return ((double) (current - past) / past) * 100;
     }
 }
