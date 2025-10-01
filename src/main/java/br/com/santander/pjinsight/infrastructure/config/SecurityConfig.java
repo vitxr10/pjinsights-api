@@ -59,7 +59,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:8080",     // frontend local
-                "https://pjinsights.loca.lt" // backend se rodar cruzado
+                "https://pjinsights.loca.lt",
+                "https://pjinsights.vercel.app"
+                // backend se rodar cruzado
         ));
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         configuration.addAllowedHeader("*");
