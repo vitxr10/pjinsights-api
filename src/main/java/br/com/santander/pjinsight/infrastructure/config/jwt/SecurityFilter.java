@@ -1,4 +1,4 @@
-package br.com.santander.pjinsight.infrastructure.config;
+package br.com.santander.pjinsight.infrastructure.config.jwt;
 
 import br.com.santander.pjinsight.infrastructure.repository.UserRepository;
 import br.com.santander.pjinsight.infrastructure.service.auth.TokenService;

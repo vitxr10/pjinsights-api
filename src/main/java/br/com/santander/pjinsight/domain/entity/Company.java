@@ -1,7 +1,5 @@
 package br.com.santander.pjinsight.domain.entity;
 
-import br.com.santander.pjinsight.domain.enums.RegistrationStatusEnum;
-import br.com.santander.pjinsight.domain.enums.SizeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

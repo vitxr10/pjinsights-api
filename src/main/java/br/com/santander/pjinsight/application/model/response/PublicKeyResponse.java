@@ -5,8 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
-    private String login;
+@NoArgsConstructor
+public class PublicKeyResponse {
+    private String kty;
+    private String alg;
+    private String publicKeyPem;
 }
