@@ -1,16 +1,12 @@
 package br.com.santander.pjinsight.domain.entity;
 
-import br.com.santander.pjinsight.domain.enums.CategoryEnum;
-import br.com.santander.pjinsight.domain.enums.PaymentMethodEnum;
-import br.com.santander.pjinsight.domain.enums.StatusEnum;
-import br.com.santander.pjinsight.domain.enums.TypeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -19,27 +15,12 @@ import java.util.UUID;
 @Data
 public class Transaction {
 
-    // rever algumas restricoes
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private LocalDateTime dateTime;
+    private LocalDate referenceDate;
     private BigDecimal amount;
-    @Enumerated(EnumType.STRING)
-    private CategoryEnum category;
-    private UUID senderId;
-    private UUID receiverId;
-    private BigDecimal previousBalance;
-    private BigDecimal newBalance;
-    @Enumerated(EnumType.STRING)
-    private PaymentMethodEnum paymentMethod;
-    @Enumerated(EnumType.STRING)
-    private StatusEnum status;
-    @Enumerated(EnumType.STRING)
-    private TypeEnum type;
-    private String description;
-
-
-
+    private String senderCnpj;
+    private String receiverCnpj;
+    private String paymentMethod;
 }

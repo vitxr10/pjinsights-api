@@ -7,6 +7,7 @@ import br.com.santander.pjinsight.infrastructure.repository.TransactionRepositor
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,16 +53,6 @@ public class TransactionService {
     }
 
     private void setTransaction(Transaction tx, TransactionRequest req) {
-        tx.setDateTime(req.getDateTime());
-        tx.setAmount(req.getAmount());
-        tx.setCategory(req.getCategory());
-        tx.setSenderId(req.getSenderId());
-        tx.setReceiverId(req.getReceiverId());
-        tx.setPreviousBalance(req.getPreviousBalance());
-        tx.setNewBalance(req.getNewBalance());
-        tx.setPaymentMethod(req.getPaymentMethod());
-        tx.setStatus(req.getStatus());
-        tx.setType(req.getType());
-        tx.setDescription(req.getDescription());
+        BeanUtils.copyProperties(req,tx);
     }
 }

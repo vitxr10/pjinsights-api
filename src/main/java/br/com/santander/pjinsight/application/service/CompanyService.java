@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -155,7 +156,7 @@ public class CompanyService {
         if (balances == null || balances.size() < 5) return 0.0;
 
         List<BalanceResponse> sorted = new ArrayList<>(balances);
-        sorted.sort(Comparator.comparing(BalanceResponse::getMonth));
+        sorted.sort(Comparator.comparing(BalanceResponse::getReferenceDate));
 
         BigDecimal fiveMonthsAgo = sorted.get(sorted.size() - 5).getBalanceValue();
         BigDecimal current = sorted.get(sorted.size() - 1).getBalanceValue();
@@ -172,10 +173,10 @@ public class CompanyService {
     public Double getTransactionGrowthLastThreeMonths(List<InvoiceResponse> invoices) {
         if (invoices == null || invoices.size() < 3) return 0.0;
 
-        Map<Short, Long> txByMonth = invoices.stream()
-                .collect(Collectors.groupingBy(InvoiceResponse::getMonth, Collectors.counting()));
+        Map<LocalDate, Long> txByMonth = invoices.stream()
+                .collect(Collectors.groupingBy(InvoiceResponse::getReferenceDate, Collectors.counting()));
 
-        List<Short> months = new ArrayList<>(txByMonth.keySet());
+        List<LocalDate> months = new ArrayList<>(txByMonth.keySet());
         Collections.sort(months);
 
         if (months.size() < 3) return 0.0;

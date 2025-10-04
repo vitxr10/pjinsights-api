@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +20,8 @@ public class Balance {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private Short month;
+    private LocalDate referenceDate;
     private BigDecimal balanceValue;
+    private String cnpj;
     private UUID companyId;
 }

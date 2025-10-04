@@ -17,7 +17,6 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
     private String street;
     private String state;
     private String zipCode;

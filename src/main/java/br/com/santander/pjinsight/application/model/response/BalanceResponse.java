@@ -5,11 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class BalanceResponse {
-    private Short month;
+    private LocalDate referenceDate;
     private BigDecimal balanceValue;
 }
