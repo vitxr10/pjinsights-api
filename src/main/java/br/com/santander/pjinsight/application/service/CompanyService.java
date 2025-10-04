@@ -36,6 +36,7 @@ public class CompanyService {
     private final AddressService addressService;
     private final BalanceService balanceService;
     private final InvoiceService invoiceService;
+    private final TransactionService transactionService;
 
     @Transactional
     public CompanyResponse save(CompanyRequest companyRequest) {
@@ -137,7 +138,7 @@ public class CompanyService {
 
         companyResponse.setAverageMonthlyInvoice(getAverageMonthlyInvoice(invoices));
         companyResponse.setBalanceGrowthLastFiveMonths(getBalanceGrowthLastFiveMonths(balances));
-        companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthLastThreeMonths(invoices));
+        companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthByCnpj(company.getCnpj()));
 
         return companyResponse;
     }
@@ -169,23 +170,16 @@ public class CompanyService {
                 .doubleValue();
     }
 
+    public Double getTransactionGrowthByCnpj(String cnpj) {
+        Integer firstMonthCount = transactionService.countTransactionsFirstMonthByCnpj(cnpj);
+        Integer lastMonthCount = transactionService.countTransactionsLastMonthByCnpj(cnpj);
 
-    public Double getTransactionGrowthLastThreeMonths(List<InvoiceResponse> invoices) {
-        if (invoices == null || invoices.size() < 3) return 0.0;
+        if (firstMonthCount == null || lastMonthCount == null || firstMonthCount == 0) {
+            return 0.0;
+        }
 
-        Map<LocalDate, Long> txByMonth = invoices.stream()
-                .collect(Collectors.groupingBy(InvoiceResponse::getReferenceDate, Collectors.counting()));
-
-        List<LocalDate> months = new ArrayList<>(txByMonth.keySet());
-        Collections.sort(months);
-
-        if (months.size() < 3) return 0.0;
-
-        Long past = txByMonth.get(months.get(months.size() - 3));
-        Long current = txByMonth.get(months.get(months.size() - 1));
-
-        if (past == null || past == 0) return 0.0;
-
-        return ((double) (current - past) / past) * 100;
+        double growth = ((double) (lastMonthCount - firstMonthCount) / firstMonthCount) * 100;
+        return Math.round(growth * 100.0) / 100.0;
     }
+
 }
