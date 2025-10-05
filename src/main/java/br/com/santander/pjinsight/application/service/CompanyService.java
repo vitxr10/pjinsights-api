@@ -143,6 +143,7 @@ public class CompanyService {
         companyResponse.setInvoice(invoices);
         companyResponse.setBalance(balances);
         companyResponse.setAddress(address);
+       // companyResponse.setClassificationDate(company.getClassificationDate());
         companyResponse.setAverageMonthlyInvoice(getAverageMonthlyInvoice(invoices));
         companyResponse.setBalanceGrowthLastFiveMonths(getBalanceGrowthLastFiveMonths(balances));
         companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthByCnpj(cnpj));
