@@ -29,6 +29,5 @@ public class CompanyResponse {
     private BigDecimal averageMonthlyInvoice;
     private Double balanceGrowthLastFiveMonths;
     private Double transactionGrowthLastThreeMonths;
-    private CompanySectorResponse companySectorResponse;
 }
 

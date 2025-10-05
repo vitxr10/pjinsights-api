@@ -2,6 +2,7 @@ package br.com.santander.pjinsight.api.controller;
 
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
+import br.com.santander.pjinsight.application.model.response.CompanySectorResponse;
 import br.com.santander.pjinsight.application.service.CompanyService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -68,5 +69,11 @@ public class CompanyController {
         var entity = companyService.update(request,companyId);
         return new ResponseEntity<>(entity, HttpStatus.OK);
 
+    }
+
+    @GetMapping("/sector-dash/{cnpj}")
+    public ResponseEntity<CompanySectorResponse> getSectorDashboardData(@PathVariable("cnpj") String cnpj){
+        CompanySectorResponse companySectorResponse = companyService.getSectorDashboardData(cnpj);
+        return ResponseEntity.status(HttpStatus.OK).body(companySectorResponse);
     }
  }

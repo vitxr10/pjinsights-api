@@ -10,45 +10,46 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class CompanyService {
 
     private final CompanyRepository repository;
-    private ProfileClassifierService profileClassifierService;
+    private final ProfileClassifierService profileClassifierService;
     private final ObjectMapper objectMapper;
     private final AddressService addressService;
     private final BalanceService balanceService;
     private final InvoiceService invoiceService;
     private final TransactionService transactionService;
 
+    // 🔹 Executor para chamadas paralelas (evita gargalo de rede)
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(8);
+
     @Transactional
     public CompanyResponse save(CompanyRequest companyRequest) {
         Company company = objectMapper.convertValue(companyRequest, Company.class);
         company = repository.save(company);
-        List<BalanceResponse> balanceResponse = balanceService.save(companyRequest.getBalance(),company.getId());
-        List<InvoiceResponse> invoiceResponse = invoiceService.save(companyRequest.getInvoice(),company.getId());
-        AddressResponse addressResponse = addressService.save(companyRequest.getAddress(),company.getId());
-        CompanyResponse companyResponse = new CompanyResponse();
-        BeanUtils.copyProperties(company,companyResponse);
-        companyResponse.setAddress(addressResponse);
-        companyResponse.setInvoice(invoiceResponse);
-        companyResponse.setBalance(balanceResponse);
-        return companyResponse;
+        var balanceResponse = balanceService.save(companyRequest.getBalance(), company.getId());
+        var invoiceResponse = invoiceService.save(companyRequest.getInvoice(), company.getId());
+        var addressResponse = addressService.save(companyRequest.getAddress(), company.getId());
+
+        var response = new CompanyResponse();
+        BeanUtils.copyProperties(company, response);
+        response.setBalance(balanceResponse);
+        response.setInvoice(invoiceResponse);
+        response.setAddress(addressResponse);
+        return response;
     }
 
     public CompanyResponse findById(UUID id) {
@@ -116,7 +117,6 @@ public class CompanyService {
         return repository.findAllClassified(pageable)
                 .map(this::toResponse);
     }
-
     private CompanyResponse toResponse(Company company) {
         var response = new CompanyResponse();
         BeanUtils.copyProperties(company, response);
@@ -125,117 +125,107 @@ public class CompanyService {
 
     public CompanyResponse findByCnpj(String cnpj) {
         Company company = repository.findByCnpj(cnpj);
-        CompanyResponse companyResponse = toResponse(company);
+        if (company == null) throw new EntityNotFoundException("Empresa não encontrada");
 
-        companyResponse.setAddress(addressService.findByCompanyId(company.getId()));
-        var invoices = invoiceService.findByCompanyId(company.getId());
-        var balances = balanceService.findByCompanyId(company.getId());
+        CompletableFuture<List<InvoiceResponse>> invoicesFuture = CompletableFuture.supplyAsync(
+                () -> invoiceService.findByCompanyId(company.getId()), EXECUTOR);
+        CompletableFuture<List<BalanceResponse>> balancesFuture = CompletableFuture.supplyAsync(
+                () -> balanceService.findByCompanyId(company.getId()), EXECUTOR);
+        CompletableFuture<AddressResponse> addressFuture = CompletableFuture.supplyAsync(
+                () -> addressService.findByCompanyId(company.getId()), EXECUTOR);
 
-        CompanySectorResponse companySectorResponse = CompanySectorResponse.builder().
-                                                      averageSectorInvoice(getAverageOtherCompaniesInvoice(cnpj)).
-                                                      sectorCompaniesAmount(getSectorCompaniesAmount(company.getCnae())).
-                                                      diffAverages(getAverageCompaniesInvoiceDiff(invoices,cnpj)).
-                                                      averageInvoice(getAverageMonthlyInvoice(invoices))
-                                                       .build();
+        List<InvoiceResponse> invoices = invoicesFuture.join();
+        List<BalanceResponse> balances = balancesFuture.join();
+        AddressResponse address = addressFuture.join();
 
+        CompanyResponse companyResponse = new CompanyResponse();
+        BeanUtils.copyProperties(company, companyResponse);
         companyResponse.setInvoice(invoices);
         companyResponse.setBalance(balances);
+        companyResponse.setAddress(address);
         companyResponse.setAverageMonthlyInvoice(getAverageMonthlyInvoice(invoices));
         companyResponse.setBalanceGrowthLastFiveMonths(getBalanceGrowthLastFiveMonths(balances));
         companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthByCnpj(cnpj));
-//        companyResponse.getCompanySectorResponse().setSectorCompaniesAmount(getSectorCompaniesAmount(company.getCnae()));
-//        companyResponse.getCompanySectorResponse().setAverageSectorInvoice(getAverageOtherCompaniesInvoice(cnpj));
-//        companyResponse.getCompanySectorResponse().setDiffAverages(getAverageCompaniesInvoiceDiff(invoices,cnpj));
-//        companyResponse.getCompanySectorResponse().setAverageInvoice(getAverageMonthlyInvoice(invoices));
-        companyResponse.setCompanySectorResponse(companySectorResponse);
+
         return companyResponse;
     }
 
+    public CompanySectorResponse getSectorDashboardData(String cnpj){
+
+        Company company = repository.findByCnpj(cnpj);
+        if (company == null) throw new EntityNotFoundException("Empresa não encontrada");
+
+        CompletableFuture<List<InvoiceResponse>> invoicesFuture = CompletableFuture.supplyAsync(
+                () -> invoiceService.findByCompanyId(company.getId()), EXECUTOR);
+
+        List<InvoiceResponse> invoices = invoicesFuture.join();
+
+        BigDecimal avgCompany = getAverageMonthlyInvoice(invoices);
+        BigDecimal avgSector = getAverageOtherCompaniesInvoice(cnpj, company.getCnae());
+        BigDecimal diff = avgCompany.subtract(avgSector);
+        Long sectorCount = repository.countByCnae(company.getCnae());
+
+        return CompanySectorResponse.builder()
+                .averageSectorInvoice(avgSector)
+                .sectorCompaniesAmount(sectorCount)
+                .diffAverages(diff)
+                .averageInvoice(avgCompany)
+                .build();
+    }
+
+    // 🔹 Calcula média de faturamento mensal
     public BigDecimal getAverageMonthlyInvoice(List<InvoiceResponse> invoices) {
         if (invoices == null || invoices.isEmpty()) return BigDecimal.ZERO;
-
         BigDecimal total = invoices.stream()
                 .map(InvoiceResponse::getInvoiceValue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         return total.divide(BigDecimal.valueOf(invoices.size()), 2, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal getAverageOtherCompaniesInvoice(String cnpj) {
-        // 1️⃣ Busca a empresa pelo CNPJ
-        Company company = repository.findByCnpj(cnpj);
-        if (company == null || company.getCnae() == null) {
-            return BigDecimal.ZERO;
-        }
+    // 🔹 Busca média setorial de forma leve
+    public BigDecimal getAverageOtherCompaniesInvoice(String cnpj, String cnae) {
+        if (cnae == null) return BigDecimal.ZERO;
 
-        // 2️⃣ Busca todas as empresas do mesmo setor (CNAE)
-        List<Company> sameSectorCompanies = repository.findByCnae(company.getCnae())
-                .stream()
-                .filter(c -> !c.getCnpj().equals(cnpj))  // remove a própria empresa
-                .toList();
+        // 🔸 Busca apenas IDs e CNPJs
+        List<Object[]> basicInfos = repository.findBasicInfoByCnaeExcludingCnpj(cnae, cnpj);
+        if (basicInfos.isEmpty()) return BigDecimal.ZERO;
 
-        if (sameSectorCompanies.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-
-        // 3️⃣ Busca todas as faturas de cada empresa e calcula a média mensal de faturamento
-        List<BigDecimal> averages = sameSectorCompanies.stream()
-                .map(c -> {
-                    List<InvoiceResponse> invoices = invoiceService.findByCompanyId(c.getId());
+        // 🔹 Processamento paralelo de faturas
+        List<CompletableFuture<BigDecimal>> futures = basicInfos.stream()
+                .map(info -> (UUID) info[0])
+                .map(id -> CompletableFuture.supplyAsync(() -> {
+                    List<InvoiceResponse> invoices = invoiceService.findByCompanyId(id);
                     return getAverageMonthlyInvoice(invoices);
-                })
-                .filter(avg -> avg.compareTo(BigDecimal.ZERO) > 0)
+                }, EXECUTOR))
                 .toList();
 
-        if (averages.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-
-        // 4️⃣ Calcula a média geral entre todas as empresas do mesmo setor
-        BigDecimal total = averages.stream()
+        BigDecimal total = futures.stream()
+                .map(CompletableFuture::join)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return total.divide(BigDecimal.valueOf(averages.size()), 2, RoundingMode.HALF_UP);
+        return futures.isEmpty() ? BigDecimal.ZERO :
+                total.divide(BigDecimal.valueOf(futures.size()), 2, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal getAverageCompaniesInvoiceDiff(List<InvoiceResponse> invoices, String cnpj) {
-        BigDecimal companyAverage = getAverageMonthlyInvoice(invoices);
-        BigDecimal othersAverage = getAverageOtherCompaniesInvoice(cnpj);
-
-        return companyAverage.subtract(othersAverage).setScale(2, RoundingMode.HALF_UP);
-    }
-
-    public Long getSectorCompaniesAmount(String cnae){
-        return repository.countByCnae(cnae);
+    public Double getTransactionGrowthByCnpj(String cnpj) {
+        Integer firstMonth = transactionService.countTransactionsFirstMonthByCnpj(cnpj);
+        Integer lastMonth = transactionService.countTransactionsLastMonthByCnpj(cnpj);
+        if (firstMonth == null || firstMonth == 0) return 0.0;
+        double growth = ((double) (lastMonth - firstMonth) / firstMonth) * 100;
+        return Math.round(growth * 100.0) / 100.0;
     }
 
     public Double getBalanceGrowthLastFiveMonths(List<BalanceResponse> balances) {
         if (balances == null || balances.size() < 5) return 0.0;
-
-        List<BalanceResponse> sorted = new ArrayList<>(balances);
-        sorted.sort(Comparator.comparing(BalanceResponse::getReferenceDate));
-
-        BigDecimal fiveMonthsAgo = sorted.get(sorted.size() - 5).getBalanceValue();
-        BigDecimal current = sorted.get(sorted.size() - 1).getBalanceValue();
-
-        if (fiveMonthsAgo.compareTo(BigDecimal.ZERO) == 0) return 0.0;
-
-        return current.subtract(fiveMonthsAgo)
-                .divide(fiveMonthsAgo, 4, RoundingMode.HALF_UP)
+        var sorted = balances.stream()
+                .sorted(Comparator.comparing(BalanceResponse::getReferenceDate))
+                .toList();
+        BigDecimal oldVal = sorted.get(sorted.size() - 5).getBalanceValue();
+        BigDecimal newVal = sorted.get(sorted.size() - 1).getBalanceValue();
+        if (oldVal.compareTo(BigDecimal.ZERO) == 0) return 0.0;
+        return newVal.subtract(oldVal)
+                .divide(oldVal, 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100))
                 .doubleValue();
     }
-
-    public Double getTransactionGrowthByCnpj(String cnpj) {
-        Integer firstMonthCount = transactionService.countTransactionsFirstMonthByCnpj(cnpj);
-        Integer lastMonthCount = transactionService.countTransactionsLastMonthByCnpj(cnpj);
-
-        if (firstMonthCount == null || lastMonthCount == null || firstMonthCount == 0) {
-            return 0.0;
-        }
-
-        double growth = ((double) (lastMonthCount - firstMonthCount) / firstMonthCount) * 100;
-        return Math.round(growth * 100.0) / 100.0;
-    }
-
 }
