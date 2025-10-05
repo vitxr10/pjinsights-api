@@ -31,6 +31,6 @@ public class Company {
     private String email;
     private String telephone;
     private String profile;
-    private LocalDateTime classificationDate;
+    private LocalDate classificationDate;
 }
 

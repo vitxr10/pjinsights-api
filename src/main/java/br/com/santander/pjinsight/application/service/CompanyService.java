@@ -1,10 +1,7 @@
 package br.com.santander.pjinsight.application.service;
 
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
-import br.com.santander.pjinsight.application.model.response.AddressResponse;
-import br.com.santander.pjinsight.application.model.response.BalanceResponse;
-import br.com.santander.pjinsight.application.model.response.CompanyResponse;
-import br.com.santander.pjinsight.application.model.response.InvoiceResponse;
+import br.com.santander.pjinsight.application.model.response.*;
 import br.com.santander.pjinsight.domain.entity.Company;
 import br.com.santander.pjinsight.infrastructure.dto.request.ProfileClassifierRequest;
 import br.com.santander.pjinsight.infrastructure.repository.CompanyRepository;
@@ -22,9 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -107,7 +105,7 @@ public class CompanyService {
             var company = companies.get(i);
             var response = responses.get(i);
             company.setProfile(response.getProfile());
-            company.setClassificationDate(LocalDateTime.now());
+            company.setClassificationDate(LocalDate.now());
         }
         repository.saveAll(companies);
     }
@@ -133,13 +131,23 @@ public class CompanyService {
         var invoices = invoiceService.findByCompanyId(company.getId());
         var balances = balanceService.findByCompanyId(company.getId());
 
+        CompanySectorResponse companySectorResponse = CompanySectorResponse.builder().
+                                                      averageSectorInvoice(getAverageOtherCompaniesInvoice(cnpj)).
+                                                      sectorCompaniesAmount(getSectorCompaniesAmount(company.getCnae())).
+                                                      diffAverages(getAverageCompaniesInvoiceDiff(invoices,cnpj)).
+                                                      averageInvoice(getAverageMonthlyInvoice(invoices))
+                                                       .build();
+
         companyResponse.setInvoice(invoices);
         companyResponse.setBalance(balances);
-
         companyResponse.setAverageMonthlyInvoice(getAverageMonthlyInvoice(invoices));
         companyResponse.setBalanceGrowthLastFiveMonths(getBalanceGrowthLastFiveMonths(balances));
-        companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthByCnpj(company.getCnpj()));
-
+        companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthByCnpj(cnpj));
+//        companyResponse.getCompanySectorResponse().setSectorCompaniesAmount(getSectorCompaniesAmount(company.getCnae()));
+//        companyResponse.getCompanySectorResponse().setAverageSectorInvoice(getAverageOtherCompaniesInvoice(cnpj));
+//        companyResponse.getCompanySectorResponse().setDiffAverages(getAverageCompaniesInvoiceDiff(invoices,cnpj));
+//        companyResponse.getCompanySectorResponse().setAverageInvoice(getAverageMonthlyInvoice(invoices));
+        companyResponse.setCompanySectorResponse(companySectorResponse);
         return companyResponse;
     }
 
@@ -151,6 +159,54 @@ public class CompanyService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return total.divide(BigDecimal.valueOf(invoices.size()), 2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getAverageOtherCompaniesInvoice(String cnpj) {
+        // 1️⃣ Busca a empresa pelo CNPJ
+        Company company = repository.findByCnpj(cnpj);
+        if (company == null || company.getCnae() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        // 2️⃣ Busca todas as empresas do mesmo setor (CNAE)
+        List<Company> sameSectorCompanies = repository.findByCnae(company.getCnae())
+                .stream()
+                .filter(c -> !c.getCnpj().equals(cnpj))  // remove a própria empresa
+                .toList();
+
+        if (sameSectorCompanies.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        // 3️⃣ Busca todas as faturas de cada empresa e calcula a média mensal de faturamento
+        List<BigDecimal> averages = sameSectorCompanies.stream()
+                .map(c -> {
+                    List<InvoiceResponse> invoices = invoiceService.findByCompanyId(c.getId());
+                    return getAverageMonthlyInvoice(invoices);
+                })
+                .filter(avg -> avg.compareTo(BigDecimal.ZERO) > 0)
+                .toList();
+
+        if (averages.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        // 4️⃣ Calcula a média geral entre todas as empresas do mesmo setor
+        BigDecimal total = averages.stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return total.divide(BigDecimal.valueOf(averages.size()), 2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getAverageCompaniesInvoiceDiff(List<InvoiceResponse> invoices, String cnpj) {
+        BigDecimal companyAverage = getAverageMonthlyInvoice(invoices);
+        BigDecimal othersAverage = getAverageOtherCompaniesInvoice(cnpj);
+
+        return companyAverage.subtract(othersAverage).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public Long getSectorCompaniesAmount(String cnae){
+        return repository.countByCnae(cnae);
     }
 
     public Double getBalanceGrowthLastFiveMonths(List<BalanceResponse> balances) {
