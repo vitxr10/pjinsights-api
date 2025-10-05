@@ -25,17 +25,17 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class AuthController {
 
-    private AuthenticationManager authenticationManager;
-    private UserRepository userRepository;
-    private TokenService tokenService;
-    AuthorizationService authorizationService;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final TokenService tokenService;
+    private AuthorizationService authorizationService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.getLogin(), data.getPassword());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((User) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(new LoginResponse(data.getLogin(),token));
 
     }
 
@@ -44,7 +44,6 @@ public class AuthController {
         if (this.userRepository.findByLogin(data.getLogin()) != null) return ResponseEntity.badRequest().build();
         RegisterResponse registerResponse = authorizationService.insert(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
-
     }
 
 
