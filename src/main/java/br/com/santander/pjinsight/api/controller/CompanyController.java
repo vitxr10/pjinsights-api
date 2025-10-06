@@ -1,6 +1,5 @@
 package br.com.santander.pjinsight.api.controller;
 
-import br.com.santander.pjinsight.application.model.request.ClassifyRequest;
 import br.com.santander.pjinsight.application.model.request.CompanyRequest;
 import br.com.santander.pjinsight.application.model.response.CompanyResponse;
 import br.com.santander.pjinsight.application.model.response.CompanySectorResponse;
@@ -53,9 +52,9 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping("/classify")
-    public ResponseEntity<Void> classify(@RequestBody ClassifyRequest request){
-        companyService.classifyCompanies(List.of(request.getCnpj()),request.getProfile());
+    @PatchMapping("/classify/{cnpj}")
+    public ResponseEntity<Void> classify(@PathVariable("cnpj") String cnpj){
+        companyService.classifyCompanies(List.of(cnpj));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -88,7 +88,7 @@ public class CompanyService {
     }
 
     @Transactional
-    public void classifyCompanies(List<String> cnpjs, String profile) {
+    public void classifyCompanies(List<String> cnpjs) {
         var companies = repository.findByCnpjIn(cnpjs);
 
         var requests = companies.stream()
@@ -100,7 +100,6 @@ public class CompanyService {
                 })
                 .toList();
 
-        if(profile == null){
             var responses = profileClassifierService.classifyProfile(requests);
 
             for (int i = 0; i < companies.size(); i++) {
@@ -109,13 +108,6 @@ public class CompanyService {
                 company.setProfile(response.getProfile());
                 company.setClassificationDate(LocalDate.now());
             }
-        }else {
-            for (int i = 0; i < companies.size(); i++) {
-                var company = companies.get(i);
-                company.setProfile(profile);
-                company.setClassificationDate(LocalDate.now());
-            }
-        }
         repository.saveAll(companies);
     }
 
