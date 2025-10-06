@@ -88,7 +88,7 @@ public class CompanyService {
     }
 
     @Transactional
-    public void classifyCompanies(List<String> cnpjs) {
+    public void classifyCompanies(List<String> cnpjs, String profile) {
         var companies = repository.findByCnpjIn(cnpjs);
 
         var requests = companies.stream()
@@ -100,19 +100,27 @@ public class CompanyService {
                 })
                 .toList();
 
-        var responses = profileClassifierService.classifyProfile(requests);
+        if(profile == null){
+            var responses = profileClassifierService.classifyProfile(requests);
 
-        for (int i = 0; i < companies.size(); i++) {
-            var company = companies.get(i);
-            var response = responses.get(i);
-            company.setProfile(response.getProfile());
-            company.setClassificationDate(LocalDate.now());
+            for (int i = 0; i < companies.size(); i++) {
+                var company = companies.get(i);
+                var response = responses.get(i);
+                company.setProfile(response.getProfile());
+                company.setClassificationDate(LocalDate.now());
+            }
+        }else {
+            for (int i = 0; i < companies.size(); i++) {
+                var company = companies.get(i);
+                company.setProfile(profile);
+                company.setClassificationDate(LocalDate.now());
+            }
         }
         repository.saveAll(companies);
     }
 
     public Page<CompanyResponse> findAllClassifiedCompanies(Integer page) {
-        var pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.ASC,"classificationDate"));
+        var pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC,"classificationDate"));
 
         return repository.findAllClassified(pageable)
                 .map(this::toResponse);

@@ -15,8 +15,6 @@ public class ProfileClassifierService {
     @Autowired
     private ProfileClassifierFeignClient client;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @SneakyThrows
     public List<ProfileClassifierResponse> classifyProfile(List<ProfileClassifierRequest> profileClassifierRequest) {
         return client.classifyProfile(profileClassifierRequest).getBody();
