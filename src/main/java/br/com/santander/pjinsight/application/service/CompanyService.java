@@ -112,7 +112,7 @@ public class CompanyService {
     }
 
     public Page<CompanyResponse> findAllClassifiedCompanies(Integer page) {
-        var pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC,"classificationDate"));
+        var pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.ASC,"classificationDate"));
 
         return repository.findAllClassified(pageable)
                 .map(this::toResponse);
