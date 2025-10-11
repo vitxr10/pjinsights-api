@@ -1,0 +1,42 @@
+package br.com.pjinsights.application.service;
+
+import br.com.pjinsights.application.dto.request.RegisterRequest;
+import br.com.pjinsights.application.dto.response.RegisterResponse;
+import br.com.pjinsights.domain.entity.User;
+import br.com.pjinsights.infrastructure.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AuthorizationService implements UserDetailsService {
+
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByLogin(username);
+    }
+
+    public RegisterResponse insert(RegisterRequest registerRequest){
+        String encryptedPassword = passwordEncoder.encode(registerRequest.getPassword());
+
+        User newUser = new User(
+                registerRequest.getLogin(),
+                encryptedPassword
+        );
+
+        newUser = this.userRepository.save(newUser);
+
+        return objectMapper.convertValue(newUser, RegisterResponse.class);
+    }
+}
