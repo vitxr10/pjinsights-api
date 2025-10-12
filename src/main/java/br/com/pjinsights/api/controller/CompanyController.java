@@ -29,7 +29,7 @@ public class CompanyController {
 
     @GetMapping("/classified")
     public ResponseEntity<Page<CompanyResponse>> findAllClassified(@RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
-        var companyResponse = companyService.findAllClassifiedCompanies(page);
+        var companyResponse = companyService.findAllClassified(page);
         return ResponseEntity.status(HttpStatus.OK).body(companyResponse);
     }
 
@@ -53,12 +53,12 @@ public class CompanyController {
 
     @PatchMapping("/classify/{cnpj}")
     public ResponseEntity<Void> classify(@PathVariable("cnpj") String cnpj){
-        companyService.classifyCompanies(List.of(cnpj));
+        companyService.classify(List.of(cnpj));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/cnpj/{cnpj}")
-    public ResponseEntity<CompanyResponse> findCompanyByCnpj(@PathVariable("cnpj") String cnpj){
+    public ResponseEntity<CompanyResponse> findByCnpj(@PathVariable("cnpj") String cnpj){
         CompanyResponse companyResponse = companyService.findByCnpj(cnpj);
         return ResponseEntity.status(HttpStatus.OK).body(companyResponse);
     }

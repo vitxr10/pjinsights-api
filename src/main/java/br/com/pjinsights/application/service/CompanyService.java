@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -98,7 +97,7 @@ public class CompanyService {
     }
 
     @Transactional
-    public void classifyCompanies(List<String> cnpjs) {
+    public void classify(List<String> cnpjs) {
         var companies = repository.findByCnpjIn(cnpjs);
 
         var requests = companies.stream()
@@ -123,7 +122,7 @@ public class CompanyService {
         repository.saveAll(companies);
     }
 
-    public Page<CompanyResponse> findAllClassifiedCompanies(Integer page) {
+    public Page<CompanyResponse> findAllClassified(Integer page) {
         var pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.ASC,"classificationDate"));
 
         return repository.findAllClassified(pageable)
@@ -157,9 +156,9 @@ public class CompanyService {
         companyResponse.setBalance(balances);
         companyResponse.setAddress(address);
 
-        companyResponse.setAverageMonthlyInvoice(getAverageMonthlyInvoice(invoices));
-        companyResponse.setBalanceGrowthLastFiveMonths(getBalanceGrowthLastFiveMonths(balances));
-        companyResponse.setTransactionGrowthLastThreeMonths(getTransactionGrowthByCnpj(cnpj));
+        companyResponse.setAverageMonthlyInvoice(invoiceService.getAverageMonthlyInvoice(invoices));
+        companyResponse.setBalanceGrowthLastFiveMonths(balanceService.getBalanceGrowthLastFiveMonths(balances));
+        companyResponse.setTransactionGrowthLastThreeMonths(transactionService.getTransactionGrowthByCnpj(cnpj));
 
         return companyResponse;
     }
@@ -173,7 +172,7 @@ public class CompanyService {
 
         List<InvoiceResponse> invoices = invoicesFuture.join();
 
-        BigDecimal avgCompany = getAverageMonthlyInvoice(invoices);
+        BigDecimal avgCompany = invoiceService.getAverageMonthlyInvoice(invoices);
         BigDecimal avgSector = getAverageOtherCompaniesInvoice(cnpj, company.getCnae());
         BigDecimal diff = avgCompany.subtract(avgSector);
 
@@ -187,16 +186,6 @@ public class CompanyService {
                 .build();
     }
 
-    public BigDecimal getAverageMonthlyInvoice(List<InvoiceResponse> invoices) {
-        if (invoices == null || invoices.isEmpty()) return BigDecimal.ZERO;
-
-        BigDecimal total = invoices.stream()
-                .map(InvoiceResponse::getInvoiceValue)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return total.divide(BigDecimal.valueOf(invoices.size()), 2, RoundingMode.HALF_UP);
-    }
-
     public BigDecimal getAverageOtherCompaniesInvoice(String cnpj, String cnae) {
         if (cnae == null) return BigDecimal.ZERO;
 
@@ -207,7 +196,7 @@ public class CompanyService {
                 .map(info -> (UUID) info[0])
                 .map(id -> CompletableFuture.supplyAsync(() -> {
                     List<InvoiceResponse> invoices = invoiceService.findByCompanyId(id);
-                    return getAverageMonthlyInvoice(invoices);
+                    return invoiceService.getAverageMonthlyInvoice(invoices);
                 }, EXECUTOR))
                 .toList();
 
@@ -217,33 +206,5 @@ public class CompanyService {
 
         return futures.isEmpty() ? BigDecimal.ZERO :
                 total.divide(BigDecimal.valueOf(futures.size()), 2, RoundingMode.HALF_UP);
-    }
-
-    public Double getTransactionGrowthByCnpj(String cnpj) {
-        Integer firstMonth = transactionService.countTransactionsFirstMonthByCnpj(cnpj);
-        Integer lastMonth = transactionService.countTransactionsLastMonthByCnpj(cnpj);
-
-        if (firstMonth == null || firstMonth == 0) return 0.0;
-        double growth = ((double) (lastMonth - firstMonth) / firstMonth) * 100;
-
-        return Math.round(growth * 100.0) / 100.0;
-    }
-
-    public Double getBalanceGrowthLastFiveMonths(List<BalanceResponse> balances) {
-        if (balances == null || balances.size() < 5) return 0.0;
-
-        var sorted = balances.stream()
-                .sorted(Comparator.comparing(BalanceResponse::getReferenceDate))
-                .toList();
-
-        BigDecimal oldVal = sorted.get(sorted.size() - 5).getBalanceValue();
-        BigDecimal newVal = sorted.get(sorted.size() - 1).getBalanceValue();
-
-        if (oldVal.compareTo(BigDecimal.ZERO) == 0) return 0.0;
-
-        return newVal.subtract(oldVal)
-                .divide(oldVal, 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100))
-                .doubleValue();
     }
 }

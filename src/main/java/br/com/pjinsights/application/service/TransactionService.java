@@ -31,4 +31,14 @@ public class TransactionService {
     public Integer countTransactionsLastMonthByCnpj(String cnpj) {
         return repository.countTransactionsLastMonthByCnpj(cnpj);
     }
+
+    public Double getTransactionGrowthByCnpj(String cnpj) {
+        Integer firstMonth = countTransactionsFirstMonthByCnpj(cnpj);
+        Integer lastMonth = countTransactionsLastMonthByCnpj(cnpj);
+
+        if (firstMonth == null || firstMonth == 0) return 0.0;
+        double growth = ((double) (lastMonth - firstMonth) / firstMonth) * 100;
+
+        return Math.round(growth * 100.0) / 100.0;
+    }
 }

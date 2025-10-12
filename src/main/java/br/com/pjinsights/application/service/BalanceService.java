@@ -9,6 +9,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,5 +46,23 @@ public class BalanceService {
                     return  balanceResponse;
                 }
         ).toList();
+    }
+
+    public Double getBalanceGrowthLastFiveMonths(List<BalanceResponse> balances) {
+        if (balances == null || balances.size() < 5) return 0.0;
+
+        var sorted = balances.stream()
+                .sorted(Comparator.comparing(BalanceResponse::getReferenceDate))
+                .toList();
+
+        BigDecimal oldVal = sorted.get(sorted.size() - 5).getBalanceValue();
+        BigDecimal newVal = sorted.get(sorted.size() - 1).getBalanceValue();
+
+        if (oldVal.compareTo(BigDecimal.ZERO) == 0) return 0.0;
+
+        return newVal.subtract(oldVal)
+                .divide(oldVal, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                .doubleValue();
     }
 }
