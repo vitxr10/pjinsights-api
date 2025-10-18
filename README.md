@@ -3,7 +3,7 @@
 ## 📋 Descrição do Projeto
 
 API REST central da plataforma PJInsights, hospedada no AWS Elastic Beanstalk, responsável por analisar dados financeiros de pessoas jurídicas. Integra um modelo de Machine Learning não supervisionado, executado na função AWS Lambda [profileclassifier](https://github.com/vitxr10/pjinsights-profileclassifier-lambda), para classificar o momento de vida das empresas, e utiliza o Gemini AI para gerar relatórios inteligentes, insights e recomendações personalizadas para clientes PJ de instituições bancárias.
-
+<br>
 ![Arquitetura solução PJInsights](./assets/ArquiteturaPJInsights.png)
 
 ### Principais Funcionalidades
