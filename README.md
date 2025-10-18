@@ -4,6 +4,8 @@
 
 API REST hospedada no AWS Elastic Beanstalk que analisa dados financeiros de pessoas jurídicas, integrando um modelo de Machine Learning não supervisionado, na função AWS Lambda [profileclassifier](https://github.com/vitxr10/pjinsights-profileclassifier-lambda) para classificar o momento de vida das empresas, e utilizando o Gemini AI para gerar relatórios inteligentes, insights e recomendações personalizadas.
 
+![Arquitetura solução PJInsights](./assets/ArquiteturaPJInsights.png)
+
 ### Principais Funcionalidades
 - Classificação automática do estágio da empresa através de modelo de machine learning treinado
 - Análise preditiva e diagnóstico do perfil financeiro utilizando IA
