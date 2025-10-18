@@ -1,6 +1,6 @@
 # PJInsights API
 
-## 📋 Descrição do Projeto
+## Descrição do Projeto
 
 API REST central da plataforma PJInsights, hospedada no AWS Elastic Beanstalk, responsável por analisar dados financeiros de pessoas jurídicas. Integra um modelo de Machine Learning não supervisionado, executado na função AWS Lambda [profileclassifier](https://github.com/vitxr10/pjinsights-profileclassifier-lambda), para classificar o momento de vida das empresas, e utiliza o Gemini AI para gerar relatórios inteligentes, insights e recomendações personalizadas para clientes PJ de instituições bancárias.
 <br>
@@ -15,7 +15,7 @@ API REST central da plataforma PJInsights, hospedada no AWS Elastic Beanstalk, r
 - Autenticação segura de usuários
 - Gestão completa de empresas e endereços
 
-## 🏗 Arquitetura
+## Arquitetura
 
 O projeto foi desenvolvido seguindo os princípios da Clean Architecture, garantindo separação de responsabilidades e independência de frameworks. A estrutura está organizada nas seguintes camadas:
 
@@ -33,7 +33,7 @@ src/main/java/br/com/pjinsights/
 - **Domain Layer**: Contém as regras de negócio e entidades
 - **Infrastructure Layer**: Gerencia aspectos técnicos como persistência e segurança
 
-## 🛠 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Backend**:
   - Java 17
@@ -54,7 +54,7 @@ src/main/java/br/com/pjinsights/
   - JWT
   - Docker
 
-## 🔌 Integrações
+## Integrações
 
 ### Gemini AI
 A integração com o Gemini AI é utilizada para:
@@ -73,7 +73,7 @@ Uma função Lambda especializada que utiliza um modelo de machine learning trei
 - Gerar insights baseados no estágio atual da empresa
 - Fornecer recomendações personalizadas baseadas no perfil identificado
 
-## 🔒 Autenticação
+## Autenticação
 
 O sistema utiliza autenticação JWT (JSON Web Token) implementada com Spring Security:
 
@@ -84,7 +84,7 @@ O sistema utiliza autenticação JWT (JSON Web Token) implementada com Spring Se
 Authorization: Bearer {seu_token_jwt}
 ```
 
-## 💾 Persistência de Dados
+## Persistência de Dados
 
 ### NeonDB (PostgreSQL)
 - Banco de dados PostgreSQL serverless
@@ -96,7 +96,7 @@ Authorization: Bearer {seu_token_jwt}
 - Abstração da camada de persistência
 - Facilidade de manutenção e testabilidade
 
-## 🚀 Deploy
+## Deploy
 
 O deploy é automatizado através de um pipeline CI/CD utilizando GitHub Actions e AWS Elastic Beanstalk. O processo é acionado automaticamente a cada push na branch main.
 
