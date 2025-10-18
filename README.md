@@ -2,7 +2,7 @@
 
 ## 📋 Descrição do Projeto
 
-A PJInsights API é uma solução centralizada para gerenciamento e análise de dados financeiros de pessoas jurídicas. A API combina análise avançada de dados com machine learning para classificar automaticamente empresas em diferentes estágios de desenvolvimento (Início, Expansão, Maturidade ou Declínio), oferecendo insights personalizados e recomendações específicas para cada perfil. Através da integração com serviços de IA e modelos de machine learning treinados, a plataforma fornece uma análise completa e precisa do cenário financeiro das empresas.
+API REST hospedada no AWS Elastic Beanstalk que analisa dados financeiros de pessoas jurídicas, integrando um modelo de Machine Learning não supervisionado, na função AWS Lambda [profileclassifier](https://github.com/vitxr10/pjinsights-profileclassifier-lambda) para classificar o momento de vida das empresas, e utilizando o Gemini AI para gerar relatórios inteligentes, insights e recomendações personalizadas.
 
 ### Principais Funcionalidades
 - Classificação automática do estágio da empresa através de modelo de machine learning treinado
